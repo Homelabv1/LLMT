@@ -1,8 +1,43 @@
 # vLLM models for GTX 1660 Super (6GB VRAM)
 # Format: HuggingFace model ID
-# Note: vLLM has ~1-2GB overhead, so max ~4GB for model
+# Updated: December 2025
+#
+# IMPORTANT: vLLM has HIGH VRAM overhead (~2-3GB for KV cache + CUDA)
+# On 6GB VRAM, only quantized models (AWQ/GPTQ) will fit reliably.
+# Use --gpu-memory-utilization 0.95 --max-model-len 2048 --enforce-eager
+#
+# FP16 models generally need 2x parameter count in GB (3B = ~6GB)
+# AWQ/GPTQ 4-bit models need ~0.5x parameter count (3B = ~1.5GB weights)
 
+# =============================================================================
+# RECOMMENDED: AWQ/GPTQ Quantized Models (will fit in 6GB)
+# =============================================================================
+
+# Qwen 3B AWQ - Good fit for 6GB
+Qwen/Qwen2.5-3B-Instruct-AWQ
+
+# Qwen 4B AWQ - Tight but workable with short context
+Qwen/Qwen3-4B-AWQ
+
+# Gemma 3 4B GPTQ - If available
+google/gemma-3-4b-it-gptq-int4
+
+# Phi-3 Mini AWQ
+microsoft/Phi-3-mini-4k-instruct-awq
+
+# =============================================================================
+# EXPERIMENTAL: FP16 (may OOM, very limited context)
+# =============================================================================
+
+# Only 1-1.5B FP16 models have a chance on 6GB
 Qwen/Qwen2.5-1.5B-Instruct
 meta-llama/Llama-3.2-1B-Instruct
-microsoft/Phi-3-mini-4k-instruct
 TinyLlama/TinyLlama-1.1B-Chat-v1.0
+HuggingFaceTB/SmolLM2-1.7B-Instruct
+
+# =============================================================================
+# DO NOT USE (will OOM on 6GB)
+# =============================================================================
+# - Any 3B+ FP16 model
+# - Any 7B+ model even quantized
+# - Models without max_model_len limits

@@ -232,6 +232,55 @@ python analyze_results.py RESULTS_DIR [options]
   --export FILE    Export to CSV
 ```
 
+## Engine-Specific Notes
+
+### Ollama
+Best for quick testing and single-user scenarios. Automatically manages model loading/unloading. Most VRAM-efficient for interactive use.
+
+### llama.cpp
+Maximum VRAM efficiency with GGUF quantized models. Requires manual model file management. Best for production deployments.
+
+### vLLM Considerations
+
+vLLM has significantly higher VRAM requirements than Ollama or llama.cpp due to:
+
+1. **KV Cache Pre-allocation**: vLLM reserves ~90% of GPU memory by default
+2. **CUDA/PyTorch Overhead**: ~0.5-1GB for buffers and memory management
+3. **Activation Memory**: ~0.2-0.5GB depending on batch size
+
+#### Realistic 6GB VRAM Budget for vLLM
+
+| Component | Size |
+|-----------|------|
+| CUDA/driver overhead | 0.5-1GB |
+| Activation memory | 0.2-0.5GB |
+| Minimum KV cache | 0.5-1GB |
+| **Available for model** | **~3.5-4.5GB** |
+
+#### What Fits on 6GB with vLLM
+
+| Model | Quantization | Fits? | Notes |
+|-------|--------------|-------|-------|
+| 1.5B | FP16 | ⚠️ | Tight, very limited context |
+| 3B | FP16 | ❌ | No room for KV cache |
+| 3B | AWQ/GPTQ 4-bit | ✅ | ~1.5GB weights, comfortable |
+| 4B | AWQ/GPTQ 4-bit | ✅ | ~2GB weights, good fit |
+| 7B | AWQ/GPTQ 4-bit | ❌ | ~3.5GB weights, no room for KV |
+
+#### Recommended vLLM Parameters for 6GB
+
+```bash
+vllm serve <model> \
+  --gpu-memory-utilization 0.95 \
+  --max-model-len 2048 \
+  --enforce-eager \
+  --max-num-seqs 4
+```
+
+**Note**: For single-user homelab assistant use cases, Ollama or llama.cpp may be more VRAM-efficient. vLLM excels at high-throughput batched inference.
+
+See [docs/USAGE.md](docs/USAGE.md) for detailed vLLM tuning guide.
+
 ## Hardware Requirements
 
 | Component | Minimum | Recommended |

@@ -339,3 +339,90 @@ python scripts/analyze_results.py results/ollama/ --compare --export results.csv
 # 4. View summary
 python scripts/score_results.py results/ollama/ summary
 ```
+
+## vLLM Memory Tuning for Low VRAM GPUs
+
+### Understanding vLLM Memory Usage
+
+vLLM memory = Model Weights + CUDA Overhead + Activations + KV Cache
+
+Unlike Ollama/llama.cpp which allocate memory on-demand, vLLM pre-allocates the KV cache at startup. This means:
+
+- A 1B model on a 24GB GPU will still use ~22GB (model + pre-allocated KV cache)
+- Reducing `gpu_memory_utilization` limits KV cache but reduces max concurrent requests
+- `max_model_len` directly impacts KV cache size
+
+### Key Parameters
+
+| Parameter | Effect | Recommendation for 6GB |
+|-----------|--------|------------------------|
+| `gpu_memory_utilization` | % of VRAM to use | 0.95 (max out) |
+| `max_model_len` | Max context length | 1024-2048 |
+| `enforce_eager` | Disable CUDA graphs | True (saves ~500MB) |
+| `max_num_seqs` | Max concurrent sequences | 4-8 |
+| `max_num_batched_tokens` | Tokens per batch | 2048-4096 |
+
+### Quantization Options
+
+vLLM supports AWQ and GPTQ quantized models from HuggingFace:
+
+```bash
+# AWQ model
+vllm serve TheBloke/Qwen-4B-AWQ --quantization awq
+
+# GPTQ model
+vllm serve TheBloke/Qwen-4B-GPTQ --quantization gptq
+```
+
+### Starting vLLM for 6GB GPUs
+
+```bash
+# Docker with optimized settings
+docker run -d --gpus all \
+    -v /mnt/llm-testing/models/hf:/root/.cache/huggingface \
+    -p 8000:8000 \
+    --name vllm \
+    vllm/vllm-openai \
+    --model Qwen/Qwen2.5-3B-Instruct-AWQ \
+    --quantization awq \
+    --gpu-memory-utilization 0.95 \
+    --max-model-len 2048 \
+    --enforce-eager \
+    --max-num-seqs 4
+```
+
+### Troubleshooting OOM Errors
+
+If you get `CUDA out of memory`:
+
+1. **Reduce `max_model_len`** - Halving it roughly doubles available KV cache space
+2. **Add `--enforce-eager`** - Disables CUDA graphs, saves ~500MB
+3. **Reduce `max_num_seqs`** - Fewer concurrent sequences
+4. **Try a smaller/more quantized model** - AWQ models use ~4x less memory
+5. **Check for other GPU processes** - Run `nvidia-smi` to verify
+
+### When to Use vLLM vs Ollama
+
+| Use Case | Recommended Engine |
+|----------|-------------------|
+| Single user, interactive | Ollama |
+| Batch processing many queries | vLLM |
+| API server, multiple users | vLLM |
+| Maximum VRAM efficiency | llama.cpp |
+| Quick model testing | Ollama |
+| Production deployment | llama.cpp or vLLM |
+
+### vLLM Memory Calculator
+
+Rough formula for 4-bit quantized models:
+
+```
+Required VRAM (GB) ≈ (Parameters in B × 0.5) + 2 + (max_model_len × 0.001)
+
+Example: Qwen3-4B AWQ with 2048 context
+= (4 × 0.5) + 2 + (2048 × 0.001)
+= 2 + 2 + 2
+= ~6GB (barely fits)
+```
+
+For FP16 models, multiply parameter estimate by 2.

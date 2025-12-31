@@ -1,9 +1,62 @@
 # llama.cpp GGUF models for GTX 1660 Super (6GB VRAM)
 # Format: /models/<filename>.gguf
-# Download from HuggingFace (TheBloke, bartowski, etc.)
+# Download from HuggingFace (ggml-org, bartowski, TheBloke, etc.)
+# Updated: December 2025
 
-/models/qwen2.5-3b-instruct-q4_K_M.gguf
+# =============================================================================
+# TIER 1 - PRIORITY (Q4_K_M quantization, ~2-3GB each)
+# =============================================================================
+
+# SmolLM3 3B - Dual-mode reasoning (/think, /no_think)
+# Source: ggml-org/SmolLM3-3B-GGUF
+/models/smollm3-3b-q4_K_M.gguf
+
+# IBM Granite 4.0 Hybrid Tiny - Mamba-2/Transformer, 1B active params
+# Source: ibm-granite/granite-4.0-tiny-preview-gguf (check availability)
+/models/granite-4.0-tiny-q4_K_M.gguf
+
+# IBM Granite 4.0 Hybrid Micro - 3B dense hybrid
+# Source: ibm-granite/granite-4.0-micro-preview-gguf
+/models/granite-4.0-micro-q4_K_M.gguf
+
+# Qwen3 4B - July 2025 update, 256K context capable
+# Source: Qwen/Qwen3-4B-GGUF or bartowski/Qwen3-4B-GGUF
+/models/qwen3-4b-q4_K_M.gguf
+
+# Gemma 3 4B - QAT optimized, multimodal
+# Source: google/gemma-3-4b-it-gguf
+/models/gemma-3-4b-it-q4_K_M.gguf
+
+# =============================================================================
+# TIER 2 - STRONG CANDIDATES
+# =============================================================================
+
+# Ministral 3B - Edge-optimized, function calling
+# Source: mistralai/Ministral-3B-Instruct-GGUF (check availability)
+/models/ministral-3b-instruct-q4_K_M.gguf
+
+# Llama 3.2 3B - Solid baseline
+# Source: meta-llama/Llama-3.2-3B-Instruct-GGUF
 /models/llama-3.2-3b-instruct-q4_K_M.gguf
+
+# Phi-4 Mini - Microsoft's efficient model
+# Source: microsoft/phi-4-mini-instruct-gguf
 /models/phi-4-mini-instruct-q4_K_M.gguf
+
+# Gemma 2 2B - Fast, lightweight
+# Source: google/gemma-2-2b-it-gguf
 /models/gemma-2-2b-it-q4_K_M.gguf
+
+# =============================================================================
+# TIER 3 - BASELINE/EXPERIMENTAL
+# =============================================================================
+
+# Qwen3 smaller variants
+/models/qwen3-1.7b-q4_K_M.gguf
+/models/qwen3-0.6b-q4_K_M.gguf
+
+# Granite Nano - smallest Granite models
+/models/granite-4.0-nano-1b-q4_K_M.gguf
+
+# Legacy models
 /models/tinyllama-1.1b-chat-v1.0-q4_K_M.gguf

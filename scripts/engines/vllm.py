@@ -3,6 +3,13 @@ vLLM adapter for the LLM Testing Framework.
 
 This module provides an adapter for the vLLM inference engine,
 using the OpenAI-compatible /v1/chat/completions endpoint.
+
+IMPORTANT: vLLM has significantly higher VRAM requirements than Ollama/llama.cpp.
+For 6GB GPUs, use quantized models (AWQ/GPTQ) with these recommended settings:
+    --gpu-memory-utilization 0.95
+    --max-model-len 2048
+    --enforce-eager
+    --max-num-seqs 4
 """
 
 import os
@@ -16,6 +23,66 @@ try:
     from core.config import VLLM_DEFAULT_URL
 except ImportError:
     VLLM_DEFAULT_URL = os.environ.get('VLLM_URL', 'http://localhost:8000')
+
+
+# =============================================================================
+# vLLM Optimized Defaults for Different VRAM Configurations
+# =============================================================================
+
+# Default vLLM parameters optimized for 6GB VRAM (GTX 1660 Super)
+VLLM_6GB_DEFAULTS = {
+    "gpu_memory_utilization": 0.95,  # Use almost all available VRAM
+    "max_model_len": 2048,           # Conservative context for 6GB
+    "enforce_eager": True,           # Disable CUDA graphs to save ~500MB
+    "max_num_seqs": 4,               # Limit concurrent sequences
+    "dtype": "auto",                 # Let vLLM choose (usually float16)
+}
+
+# Default vLLM parameters for 8GB VRAM (RTX 3060 Ti, 3070)
+VLLM_8GB_DEFAULTS = {
+    "gpu_memory_utilization": 0.95,
+    "max_model_len": 4096,           # More context available
+    "enforce_eager": True,
+    "max_num_seqs": 8,
+    "dtype": "auto",
+}
+
+# Default vLLM parameters for 24GB+ VRAM (RTX 3090 Ti)
+VLLM_24GB_DEFAULTS = {
+    "gpu_memory_utilization": 0.90,  # Leave some headroom
+    "max_model_len": 8192,           # Full context for most models
+    "enforce_eager": False,          # CUDA graphs OK with more memory
+    "max_num_seqs": 32,
+    "dtype": "auto",
+}
+
+# Model-specific config overrides for 6GB
+VLLM_MODEL_CONFIGS_6GB = {
+    # AWQ quantized models - can use longer context
+    "awq": {
+        "max_model_len": 4096,       # AWQ models use ~4x less memory
+    },
+    "gptq": {
+        "max_model_len": 4096,       # GPTQ similar to AWQ
+    },
+    # FP16 models - very limited
+    "1.5b_fp16": {
+        "max_model_len": 2048,
+    },
+    "3b_fp16": {
+        "max_model_len": 1024,       # Very tight on 6GB
+    },
+}
+
+# VRAM estimates for common model sizes
+VRAM_ESTIMATES = {
+    # FP16: ~2GB per billion parameters
+    # 4-bit: ~0.5GB per billion parameters
+    "fp16": 2.0,      # GB per billion params
+    "awq": 0.5,       # GB per billion params
+    "gptq": 0.5,      # GB per billion params
+    "overhead": 2.0,  # CUDA/KV cache baseline overhead in GB
+}
 
 
 class VLLMAdapter:
@@ -311,24 +378,26 @@ class VLLMAdapter:
             pass
         return None
 
-    def check_model_compatibility(self, model_name: str) -> Dict:
+    def check_model_compatibility(
+        self,
+        model_name: str,
+        available_vram_gb: float = 6.0
+    ) -> Dict:
         """
         Check if a model is compatible with the current GPU setup.
 
-        This is a basic check - actual compatibility depends on
-        GPU memory, quantization, etc.
-
         Args:
             model_name: HuggingFace model ID
+            available_vram_gb: Available GPU VRAM in GB
 
         Returns:
-            Compatibility info dictionary
+            Compatibility info dictionary with VRAM estimates and recommendations
         """
         # Common model sizes (approximate, in billions of parameters)
         size_hints = {
-            '0.5b': 0.5, '1b': 1, '1.5b': 1.5, '3b': 3, '4b': 4,
-            '7b': 7, '8b': 8, '13b': 13, '14b': 14, '32b': 32,
-            '70b': 70, '72b': 72
+            '0.5b': 0.5, '0.6b': 0.6, '1b': 1, '1.5b': 1.5, '1.7b': 1.7,
+            '3b': 3, '3.4b': 3.4, '4b': 4, '7b': 7, '8b': 8,
+            '13b': 13, '14b': 14, '32b': 32, '70b': 70, '72b': 72
         }
 
         model_lower = model_name.lower()
@@ -339,20 +408,83 @@ class VLLMAdapter:
                 estimated_size = size
                 break
 
-        # Very rough VRAM estimates (FP16)
-        # ~2GB per billion parameters
-        if estimated_size:
-            estimated_vram_gb = estimated_size * 2
+        # Detect quantization type
+        quantization = 'fp16'  # Default assumption
+        if 'awq' in model_lower:
+            quantization = 'awq'
+        elif 'gptq' in model_lower:
+            quantization = 'gptq'
 
-            return {
-                'model': model_name,
-                'estimated_params_b': estimated_size,
-                'estimated_vram_fp16_gb': estimated_vram_gb,
-                'notes': 'AWQ/GPTQ quantization can reduce VRAM by ~4x'
-            }
-
-        return {
+        result = {
             'model': model_name,
-            'estimated_params_b': None,
-            'notes': 'Could not estimate model size from name'
+            'estimated_params_b': estimated_size,
+            'quantization': quantization,
+            'available_vram_gb': available_vram_gb,
+            'fits': False,
+            'notes': []
         }
+
+        if estimated_size:
+            # Calculate VRAM requirements
+            vram_per_b = VRAM_ESTIMATES.get(quantization, VRAM_ESTIMATES['fp16'])
+            overhead = VRAM_ESTIMATES['overhead']
+
+            model_vram = estimated_size * vram_per_b
+            total_vram = model_vram + overhead
+
+            result['estimated_model_vram_gb'] = round(model_vram, 1)
+            result['estimated_total_vram_gb'] = round(total_vram, 1)
+
+            # Check if it fits
+            if total_vram <= available_vram_gb:
+                result['fits'] = True
+                headroom = available_vram_gb - total_vram
+                result['notes'].append(f"Should fit with ~{headroom:.1f}GB headroom")
+
+                # Recommend max_model_len based on headroom
+                if headroom > 2:
+                    result['recommended_max_model_len'] = 8192
+                elif headroom > 1:
+                    result['recommended_max_model_len'] = 4096
+                else:
+                    result['recommended_max_model_len'] = 2048
+            else:
+                result['fits'] = False
+                needed = total_vram - available_vram_gb
+                result['notes'].append(f"Needs ~{needed:.1f}GB more VRAM")
+
+                # Suggest quantization if using FP16
+                if quantization == 'fp16':
+                    quantized_vram = estimated_size * VRAM_ESTIMATES['awq'] + overhead
+                    if quantized_vram <= available_vram_gb:
+                        result['notes'].append(
+                            f"AWQ/GPTQ version would use ~{quantized_vram:.1f}GB"
+                        )
+
+        else:
+            result['notes'].append('Could not estimate model size from name')
+            result['notes'].append('Check model card for VRAM requirements')
+
+        # Add general recommendations for low VRAM
+        if available_vram_gb <= 8:
+            result['notes'].append('Use --enforce-eager to save ~500MB')
+            result['notes'].append('Use --max-model-len 2048 for safety')
+
+        return result
+
+    def get_recommended_config(self, vram_gb: float = 6.0) -> Dict:
+        """
+        Get recommended vLLM launch configuration for given VRAM.
+
+        Args:
+            vram_gb: Available GPU VRAM in GB
+
+        Returns:
+            Dictionary of recommended vLLM parameters
+        """
+        if vram_gb <= 6:
+            return VLLM_6GB_DEFAULTS.copy()
+        elif vram_gb <= 8:
+            return VLLM_8GB_DEFAULTS.copy()
+        else:
+            return VLLM_24GB_DEFAULTS.copy()
