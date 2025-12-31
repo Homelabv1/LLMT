@@ -159,18 +159,18 @@ llm-testing/
 
 ## Test Questions
 
-The framework includes 42 sample test questions across 8 categories (customizable):
+The framework includes 42 sample test questions for a **homelab inventory assistant** use case, covering 8 categories:
 
-1. **Simple Lookups (8)**: Direct information retrieval
-2. **Aggregation (6)**: Sum/count operations
-3. **Filtering (6)**: Conditional logic
-4. **Compatibility (6)**: Relationship reasoning
-5. **Complex Multi-step (4)**: Chained reasoning
-6. **Natural Language (5)**: Informal query variations
-7. **Data Management (3)**: Change/update scenarios
+1. **Simple Lookups (8)**: Direct retrieval (IP addresses, RAM, CPUs)
+2. **Aggregation (6)**: Sum/count operations (total VRAM, system counts)
+3. **Filtering (6)**: Conditional logic (systems with 10GbE, GPUs)
+4. **Compatibility (6)**: Hardware relationships (RAM compatibility, upgrades)
+5. **Complex Multi-step (4)**: Chained reasoning (best upgrade candidate)
+6. **Natural Language (5)**: Informal query variations ("got anything beefy?")
+7. **Inventory Management (3)**: Change/update scenarios
 8. **Error Handling (4)**: Missing/invalid data responses
 
-Custom question sets can be provided via `--questions` flag.
+Custom question sets can be provided via `--questions` and `--inventory` flags for your own use cases.
 
 ## Scoring System
 
