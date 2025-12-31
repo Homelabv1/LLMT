@@ -58,6 +58,20 @@ from .logging_config import (
     setup_logging,
     get_logger,
 )
+from .preflight import (
+    ModelStatus,
+    OverallStatus,
+    ModelCheck,
+    ConnectivityCheck,
+    PreflightResult,
+    PreflightChecker,
+    OllamaPreflightChecker,
+    LlamaCppPreflightChecker,
+    VLLMPreflightChecker,
+    get_preflight_checker,
+    run_preflight,
+    detect_gpu,
+)
 
 __all__ = [
     # config
@@ -97,6 +111,19 @@ __all__ = [
     # logging
     'setup_logging',
     'get_logger',
+    # preflight
+    'ModelStatus',
+    'OverallStatus',
+    'ModelCheck',
+    'ConnectivityCheck',
+    'PreflightResult',
+    'PreflightChecker',
+    'OllamaPreflightChecker',
+    'LlamaCppPreflightChecker',
+    'VLLMPreflightChecker',
+    'get_preflight_checker',
+    'run_preflight',
+    'detect_gpu',
 ]
 
 __version__ = '1.0.0'

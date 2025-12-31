@@ -44,6 +44,7 @@ from core.metrics import (
     verify_vram_cleared,
 )
 from engines import get_adapter, DEFAULT_URLS
+from core.preflight import run_preflight, OverallStatus, ModelStatus
 
 
 # Global shutdown flag
@@ -202,6 +203,28 @@ Examples:
         help='Preview configuration without executing'
     )
 
+    # Pre-flight checks
+    parser.add_argument(
+        '--preflight',
+        action='store_true',
+        help='Run pre-flight checks before testing'
+    )
+    parser.add_argument(
+        '--preflight-full',
+        action='store_true',
+        help='Run full pre-flight including load tests'
+    )
+    parser.add_argument(
+        '--preflight-only',
+        action='store_true',
+        help='Only run pre-flight, do not start tests'
+    )
+    parser.add_argument(
+        '--skip-preflight-vram',
+        action='store_true',
+        help='Skip VRAM estimation in pre-flight'
+    )
+
     return parser.parse_args()
 
 
@@ -234,6 +257,113 @@ def count_status(results_dir: str, models: List[str], total_questions: int = 100
             pending += 1
 
     return complete, partial, pending
+
+
+def run_preflight_check(
+    engine: str,
+    models: List[str],
+    url: str,
+    full: bool = False,
+    skip_vram: bool = False
+) -> bool:
+    """
+    Run pre-flight checks and return True if can proceed.
+
+    Args:
+        engine: Engine name
+        models: List of model names
+        url: Engine URL
+        full: Include load tests
+        skip_vram: Skip VRAM checks
+
+    Returns:
+        True if pre-flight passed and tests can proceed
+    """
+    print("\n" + "=" * 70)
+    print("PRE-FLIGHT CHECK")
+    print("=" * 70)
+
+    result = run_preflight(
+        engine=engine,
+        models=models,
+        url=url,
+        full=full,
+        skip_vram_check=skip_vram,
+        timeout=30
+    )
+
+    # Print connectivity status
+    conn = result.connectivity
+    if conn.service_running and conn.api_reachable:
+        print(f"✓ {engine.capitalize()} service running (v{conn.api_version or 'unknown'})")
+    else:
+        print(f"✗ {engine.capitalize()} service not available")
+        if conn.error_message:
+            print(f"  Error: {conn.error_message}")
+
+    if conn.gpu_detected:
+        print(f"✓ GPU: {conn.gpu_name} ({conn.gpu_vram_gb:.0f}GB)")
+    else:
+        print("⚠ No GPU detected")
+
+    # Count results
+    ready_cached = sum(1 for m in result.models if m.status == ModelStatus.READY_CACHED)
+    ready_download = sum(1 for m in result.models if m.status in (
+        ModelStatus.READY_NEEDS_DOWNLOAD, ModelStatus.WARNING_NEEDS_DOWNLOAD
+    ))
+    warnings = sum(1 for m in result.models if m.status.value.startswith("warning"))
+    failed = sum(1 for m in result.models if m.status.value.startswith("failed"))
+
+    print(f"\nModels: {len(result.models)} total")
+    print(f"  ✓ Ready (cached): {ready_cached}")
+    if ready_download > 0:
+        print(f"  ⚠ Ready (need download): {ready_download}")
+    if warnings > 0:
+        print(f"  ⚠ Warnings: {warnings}")
+    if failed > 0:
+        print(f"  ✗ Failed: {failed}")
+
+    # Show failed models
+    failed_models = [m for m in result.models if m.status.value.startswith("failed")]
+    if failed_models:
+        print("\nFailed models:")
+        for m in failed_models:
+            reason = m.error_message or m.status.value
+            print(f"  - {m.name}: {reason}")
+
+    # Show warnings
+    warning_models = [m for m in result.models if m.status.value.startswith("warning")]
+    if warning_models:
+        print("\nWarnings:")
+        for m in warning_models:
+            print(f"  - {m.name}: {m.vram_fit_status}")
+
+    print("=" * 70)
+
+    # Determine if we can proceed
+    if result.overall_status == OverallStatus.FAILED:
+        print("✗ Pre-flight FAILED")
+        if not result.can_proceed:
+            print("  Cannot proceed with tests.")
+            return False
+        else:
+            print("  Some models failed, but others can proceed.")
+    elif result.overall_status == OverallStatus.WARNING:
+        print("⚠ Pre-flight passed with warnings")
+        # Ask for confirmation
+        try:
+            response = input("Continue anyway? [y/N]: ").strip().lower()
+            if response not in ('y', 'yes'):
+                print("Aborted by user.")
+                return False
+        except (EOFError, KeyboardInterrupt):
+            print("\nAborted.")
+            return False
+    else:
+        print("✓ Pre-flight PASSED")
+
+    print()
+    return True
 
 
 def main():
@@ -284,6 +414,31 @@ def main():
     if not models:
         print("[ERROR] Provide --models or --config")
         return 1
+
+    # Get URL
+    url = args.url or DEFAULT_URLS.get(args.engine)
+
+    # Pre-flight check
+    if args.preflight or args.preflight_full or args.preflight_only:
+        can_proceed = run_preflight_check(
+            engine=args.engine,
+            models=models,
+            url=url,
+            full=args.preflight_full,
+            skip_vram=args.skip_preflight_vram
+        )
+
+        if args.preflight_only:
+            if can_proceed:
+                print("Pre-flight passed. Exiting (--preflight-only)")
+                return 0
+            else:
+                return 1
+
+        if not can_proceed:
+            return 1
+
+        print("Pre-flight passed. Starting tests...\n")
 
     # Print header
     print("=" * 70)
@@ -338,7 +493,6 @@ def main():
         return 1
 
     # Get engine adapter
-    url = args.url or DEFAULT_URLS.get(args.engine)
     print(f"\nConnecting to {args.engine} at {url}...")
 
     try:
