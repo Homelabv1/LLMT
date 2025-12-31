@@ -1,0 +1,11 @@
+# vLLM models for RTX 3090 Ti (24GB VRAM)
+
+# Full precision smaller models
+Qwen/Qwen2.5-7B-Instruct
+meta-llama/Llama-3.1-8B-Instruct
+
+# GPTQ/AWQ quantized larger models
+Qwen/Qwen2.5-14B-Instruct-GPTQ-Int4
+TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ
+TheBloke/Llama-2-13B-Chat-AWQ
+TheBloke/CodeLlama-34B-Instruct-GPTQ

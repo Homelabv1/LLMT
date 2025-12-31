@@ -1,0 +1,12 @@
+# llama.cpp GGUF models for RTX 3090 Ti + RTX 3060 Ti (32GB VRAM)
+# Use with: --tensor-split 0.75,0.25 (proportional to VRAM: 24:8)
+
+# Medium models
+/models/qwen2.5-14b-instruct-q4_K_M.gguf
+/models/llama-3.1-13b-instruct-q4_K_M.gguf
+/models/mixtral-8x7b-instruct-v0.1-q4_K_M.gguf
+/models/qwen2.5-32b-instruct-q4_K_M.gguf
+
+# Large models enabled by 32GB
+/models/llama-3.1-70b-instruct-q4_K_M.gguf
+/models/qwen2.5-72b-instruct-q3_K_M.gguf

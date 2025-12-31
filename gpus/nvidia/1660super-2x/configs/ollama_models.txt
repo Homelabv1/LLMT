@@ -1,0 +1,19 @@
+# Ollama models for 2x GTX 1660 Super (12GB VRAM total)
+# Note: Create multi-GPU Modelfile with PARAMETER num_gpu 999
+
+# All models from 1x config
+qwen3:0.6b
+qwen3:1.7b
+qwen3:4b
+llama3.2:1b
+llama3.2:3b
+phi4-mini:3.8b
+gemma3:1b
+gemma3:4b
+
+# Larger models enabled by 12GB VRAM
+mistral:7b-instruct-q4_K_M
+qwen2.5:7b-instruct-q4_K_M
+llama3.1:8b-instruct-q4_K_M
+deepseek-r1:7b
+codellama:7b-instruct-q4_K_M

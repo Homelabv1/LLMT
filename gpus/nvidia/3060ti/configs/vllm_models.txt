@@ -1,0 +1,11 @@
+# vLLM models for RTX 3060 Ti (8GB VRAM)
+
+# Smaller full-precision models
+Qwen/Qwen2.5-1.5B-Instruct
+meta-llama/Llama-3.2-1B-Instruct
+microsoft/Phi-3-mini-4k-instruct
+
+# AWQ quantized 7B models
+Qwen/Qwen2.5-7B-Instruct-AWQ
+TheBloke/Mistral-7B-Instruct-v0.2-AWQ
+TheBloke/Llama-2-7B-Chat-AWQ

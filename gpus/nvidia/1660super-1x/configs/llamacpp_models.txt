@@ -1,0 +1,9 @@
+# llama.cpp GGUF models for GTX 1660 Super (6GB VRAM)
+# Format: /models/<filename>.gguf
+# Download from HuggingFace (TheBloke, bartowski, etc.)
+
+/models/qwen2.5-3b-instruct-q4_K_M.gguf
+/models/llama-3.2-3b-instruct-q4_K_M.gguf
+/models/phi-4-mini-instruct-q4_K_M.gguf
+/models/gemma-2-2b-it-q4_K_M.gguf
+/models/tinyllama-1.1b-chat-v1.0-q4_K_M.gguf

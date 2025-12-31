@@ -1,0 +1,539 @@
+{
+  "servers": [
+    {
+      "name": "pve-main",
+      "type": "server",
+      "ip": "192.168.1.10",
+      "cpu": {"model": "AMD EPYC 7302", "cores": 16, "threads": 32},
+      "ram_gb": 256,
+      "ram_slots": {"used": 8, "total": 8, "type": "DDR4 ECC 3200MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 980 Pro", "capacity_gb": 2000},
+        {"type": "hdd", "model": "WD Red Plus", "capacity_gb": 8000, "count": 4}
+      ],
+      "network": ["10GbE", "1GbE", "IPMI"],
+      "gpus": [],
+      "motherboard": "Supermicro H12SSL-i",
+      "psu_watts": 750,
+      "role": "Primary Proxmox host",
+      "location": "Rack 1, U1-U4",
+      "notes": "Runs main VMs and containers"
+    },
+    {
+      "name": "pve-backup",
+      "type": "server",
+      "ip": "192.168.1.11",
+      "cpu": {"model": "Intel Xeon E5-2680 v4", "cores": 14, "threads": 28},
+      "ram_gb": 128,
+      "ram_slots": {"used": 4, "total": 8, "type": "DDR4 ECC 2400MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Intel P4610", "capacity_gb": 1600},
+        {"type": "hdd", "model": "Seagate Exos X16", "capacity_gb": 16000, "count": 8}
+      ],
+      "network": ["10GbE", "1GbE", "IPMI"],
+      "gpus": [],
+      "motherboard": "Supermicro X10SRH-CF",
+      "psu_watts": 650,
+      "role": "Backup Proxmox host and Proxmox Backup Server",
+      "location": "Rack 1, U5-U8",
+      "notes": "Secondary cluster node, handles backups"
+    },
+    {
+      "name": "nas-primary",
+      "type": "server",
+      "ip": "192.168.1.20",
+      "cpu": {"model": "AMD Ryzen 5 5600G", "cores": 6, "threads": 12},
+      "ram_gb": 64,
+      "ram_slots": {"used": 2, "total": 4, "type": "DDR4 3200MHz ECC"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 970 EVO Plus", "capacity_gb": 500},
+        {"type": "hdd", "model": "WD Red Pro", "capacity_gb": 18000, "count": 6}
+      ],
+      "network": ["10GbE", "10GbE", "1GbE"],
+      "gpus": [],
+      "motherboard": "ASRock Rack X570D4U-2L2T",
+      "psu_watts": 550,
+      "role": "Primary NAS (TrueNAS Scale)",
+      "location": "Rack 1, U9-U12",
+      "notes": "RAID-Z2 with 6x 18TB drives, ~72TB usable"
+    },
+    {
+      "name": "nas-offsite",
+      "type": "server",
+      "ip": "192.168.2.20",
+      "cpu": {"model": "Intel Celeron J4125", "cores": 4, "threads": 4},
+      "ram_gb": 16,
+      "ram_slots": {"used": 1, "total": 2, "type": "DDR4 2666MHz SO-DIMM"},
+      "storage": [
+        {"type": "ssd", "model": "Samsung 870 EVO", "capacity_gb": 250},
+        {"type": "hdd", "model": "Seagate IronWolf", "capacity_gb": 8000, "count": 4}
+      ],
+      "network": ["2.5GbE", "1GbE"],
+      "gpus": [],
+      "motherboard": "ODROID-H3+",
+      "psu_watts": 60,
+      "role": "Offsite backup NAS",
+      "location": "Remote site",
+      "notes": "Low power, receives nightly backups"
+    },
+    {
+      "name": "k8s-master-01",
+      "type": "server",
+      "ip": "192.168.1.30",
+      "cpu": {"model": "Intel Xeon E-2278G", "cores": 8, "threads": 16},
+      "ram_gb": 64,
+      "ram_slots": {"used": 2, "total": 4, "type": "DDR4 ECC 2666MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 980 Pro", "capacity_gb": 1000}
+      ],
+      "network": ["10GbE", "1GbE", "IPMI"],
+      "gpus": [],
+      "motherboard": "Supermicro X11SCH-F",
+      "psu_watts": 400,
+      "role": "Kubernetes control plane",
+      "location": "Rack 1, U15",
+      "notes": "k3s master node"
+    },
+    {
+      "name": "k8s-worker-01",
+      "type": "server",
+      "ip": "192.168.1.31",
+      "cpu": {"model": "Intel Xeon E-2278G", "cores": 8, "threads": 16},
+      "ram_gb": 128,
+      "ram_slots": {"used": 4, "total": 4, "type": "DDR4 ECC 2666MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 980 Pro", "capacity_gb": 2000}
+      ],
+      "network": ["10GbE", "1GbE"],
+      "gpus": [{"model": "NVIDIA T4", "vram_gb": 16}],
+      "motherboard": "Supermicro X11SCH-F",
+      "psu_watts": 500,
+      "role": "Kubernetes worker with GPU",
+      "location": "Rack 1, U16",
+      "notes": "GPU workloads"
+    },
+    {
+      "name": "k8s-worker-02",
+      "type": "server",
+      "ip": "192.168.1.32",
+      "cpu": {"model": "Intel Xeon E-2278G", "cores": 8, "threads": 16},
+      "ram_gb": 128,
+      "ram_slots": {"used": 4, "total": 4, "type": "DDR4 ECC 2666MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 980 Pro", "capacity_gb": 2000}
+      ],
+      "network": ["10GbE", "1GbE"],
+      "gpus": [],
+      "motherboard": "Supermicro X11SCH-F",
+      "psu_watts": 400,
+      "role": "Kubernetes worker",
+      "location": "Rack 1, U17",
+      "notes": "General workloads"
+    },
+    {
+      "name": "db-server",
+      "type": "server",
+      "ip": "192.168.1.40",
+      "cpu": {"model": "AMD EPYC 7302P", "cores": 16, "threads": 32},
+      "ram_gb": 256,
+      "ram_slots": {"used": 8, "total": 8, "type": "DDR4 ECC 3200MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Intel Optane P5800X", "capacity_gb": 800},
+        {"type": "nvme", "model": "Samsung PM9A3", "capacity_gb": 3840, "count": 4}
+      ],
+      "network": ["10GbE", "10GbE", "IPMI"],
+      "gpus": [],
+      "motherboard": "Supermicro H12SSL-i",
+      "psu_watts": 650,
+      "role": "Database server (PostgreSQL, Redis)",
+      "location": "Rack 1, U19-U20",
+      "notes": "Optane for WAL, PM9A3 for data"
+    },
+    {
+      "name": "media-server",
+      "type": "server",
+      "ip": "192.168.1.50",
+      "cpu": {"model": "Intel Core i5-12400", "cores": 6, "threads": 12},
+      "ram_gb": 32,
+      "ram_slots": {"used": 2, "total": 4, "type": "DDR4 3200MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 970 EVO Plus", "capacity_gb": 500}
+      ],
+      "network": ["2.5GbE", "1GbE"],
+      "gpus": [{"model": "Intel UHD 730", "vram_gb": 0, "type": "integrated"}],
+      "motherboard": "ASRock B660M Pro RS",
+      "psu_watts": 350,
+      "role": "Plex/Jellyfin media server",
+      "location": "Rack 1, U21",
+      "notes": "Quick Sync for transcoding"
+    },
+    {
+      "name": "monitoring-server",
+      "type": "server",
+      "ip": "192.168.1.60",
+      "cpu": {"model": "Intel Xeon E-2224", "cores": 4, "threads": 4},
+      "ram_gb": 32,
+      "ram_slots": {"used": 2, "total": 4, "type": "DDR4 ECC 2666MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 970 EVO", "capacity_gb": 1000}
+      ],
+      "network": ["1GbE", "IPMI"],
+      "gpus": [],
+      "motherboard": "Supermicro X11SCL-F",
+      "psu_watts": 300,
+      "role": "Monitoring (Prometheus, Grafana, Loki)",
+      "location": "Rack 1, U22",
+      "notes": "30 days metrics retention"
+    }
+  ],
+  "desktops": [
+    {
+      "name": "desktop-workstation",
+      "type": "desktop",
+      "ip": "192.168.1.150",
+      "cpu": {"model": "AMD Ryzen 9 5950X", "cores": 16, "threads": 32},
+      "ram_gb": 64,
+      "ram_slots": {"used": 2, "total": 4, "type": "DDR4 3600MHz"},
+      "storage": [
+        {"type": "nvme", "model": "WD Black SN850", "capacity_gb": 1000},
+        {"type": "nvme", "model": "Samsung 970 EVO Plus", "capacity_gb": 2000}
+      ],
+      "network": ["2.5GbE"],
+      "gpus": [{"model": "RTX 3080", "vram_gb": 10}],
+      "motherboard": "ASUS ROG Crosshair VIII",
+      "psu_watts": 850,
+      "role": "Development workstation",
+      "location": "Office desk",
+      "notes": "Main development machine"
+    },
+    {
+      "name": "desktop-gaming",
+      "type": "desktop",
+      "ip": "192.168.1.151",
+      "cpu": {"model": "Intel Core i7-12700K", "cores": 12, "threads": 20},
+      "ram_gb": 32,
+      "ram_slots": {"used": 2, "total": 4, "type": "DDR5 5600MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 980 Pro", "capacity_gb": 2000}
+      ],
+      "network": ["2.5GbE", "WiFi 6E"],
+      "gpus": [{"model": "RTX 4070 Ti", "vram_gb": 12}],
+      "motherboard": "ASUS ROG STRIX Z690-E",
+      "psu_watts": 850,
+      "role": "Gaming PC",
+      "location": "Living room",
+      "notes": "Also used for occasional dev work"
+    },
+    {
+      "name": "desktop-htpc",
+      "type": "desktop",
+      "ip": "192.168.1.152",
+      "cpu": {"model": "AMD Ryzen 5 5600G", "cores": 6, "threads": 12},
+      "ram_gb": 16,
+      "ram_slots": {"used": 2, "total": 2, "type": "DDR4 3200MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 970 EVO", "capacity_gb": 500}
+      ],
+      "network": ["1GbE", "WiFi 6"],
+      "gpus": [{"model": "AMD Radeon (integrated)", "vram_gb": 0, "type": "integrated"}],
+      "motherboard": "ASRock DeskMini X300",
+      "psu_watts": 120,
+      "role": "Home theater PC",
+      "location": "Living room TV",
+      "notes": "Runs Kodi"
+    },
+    {
+      "name": "desktop-guest",
+      "type": "desktop",
+      "ip": "192.168.1.153",
+      "cpu": {"model": "Intel Core i5-10400", "cores": 6, "threads": 12},
+      "ram_gb": 16,
+      "ram_slots": {"used": 2, "total": 4, "type": "DDR4 2666MHz"},
+      "storage": [
+        {"type": "ssd", "model": "Samsung 870 EVO", "capacity_gb": 500}
+      ],
+      "network": ["1GbE"],
+      "gpus": [{"model": "GTX 1650", "vram_gb": 4}],
+      "motherboard": "MSI B460M PRO-VDH",
+      "psu_watts": 450,
+      "role": "Guest workstation",
+      "location": "Guest room",
+      "notes": "For visitors"
+    },
+    {
+      "name": "desktop-test",
+      "type": "desktop",
+      "ip": "192.168.1.154",
+      "cpu": {"model": "AMD Ryzen 7 3700X", "cores": 8, "threads": 16},
+      "ram_gb": 32,
+      "ram_slots": {"used": 2, "total": 4, "type": "DDR4 3200MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 970 EVO", "capacity_gb": 500},
+        {"type": "ssd", "model": "Crucial MX500", "capacity_gb": 1000}
+      ],
+      "network": ["1GbE"],
+      "gpus": [{"model": "RX 6600 XT", "vram_gb": 8}],
+      "motherboard": "MSI B450 TOMAHAWK MAX",
+      "psu_watts": 550,
+      "role": "Testing and experiments",
+      "location": "Lab bench",
+      "notes": "Used for hardware testing"
+    }
+  ],
+  "mini_pcs": [
+    {
+      "name": "mini-pc-01",
+      "type": "mini_pc",
+      "ip": "192.168.1.101",
+      "cpu": {"model": "Intel N100", "cores": 4, "threads": 4},
+      "ram_gb": 16,
+      "ram_slots": {"used": 1, "total": 1, "type": "DDR5 4800MHz SO-DIMM"},
+      "storage": [
+        {"type": "nvme", "model": "Generic", "capacity_gb": 512}
+      ],
+      "network": ["2.5GbE", "2.5GbE"],
+      "gpus": [],
+      "motherboard": "Integrated",
+      "psu_watts": 65,
+      "role": "Docker host",
+      "location": "Network closet",
+      "notes": "Fanless"
+    },
+    {
+      "name": "mini-pc-02",
+      "type": "mini_pc",
+      "ip": "192.168.1.102",
+      "cpu": {"model": "Intel N100", "cores": 4, "threads": 4},
+      "ram_gb": 16,
+      "ram_slots": {"used": 1, "total": 1, "type": "DDR5 4800MHz SO-DIMM"},
+      "storage": [
+        {"type": "nvme", "model": "Generic", "capacity_gb": 512}
+      ],
+      "network": ["2.5GbE", "2.5GbE"],
+      "gpus": [],
+      "motherboard": "Integrated",
+      "psu_watts": 65,
+      "role": "Pi-hole DNS",
+      "location": "Network closet",
+      "notes": "Fanless, primary DNS"
+    },
+    {
+      "name": "mini-pc-03",
+      "type": "mini_pc",
+      "ip": "192.168.1.103",
+      "cpu": {"model": "Intel N100", "cores": 4, "threads": 4},
+      "ram_gb": 16,
+      "ram_slots": {"used": 1, "total": 1, "type": "DDR5 4800MHz SO-DIMM"},
+      "storage": [
+        {"type": "nvme", "model": "Generic", "capacity_gb": 512}
+      ],
+      "network": ["2.5GbE", "2.5GbE"],
+      "gpus": [],
+      "motherboard": "Integrated",
+      "psu_watts": 65,
+      "role": "Pi-hole DNS backup",
+      "location": "Network closet",
+      "notes": "Fanless, secondary DNS"
+    },
+    {
+      "name": "mini-pc-04",
+      "type": "mini_pc",
+      "ip": "192.168.1.104",
+      "cpu": {"model": "AMD Ryzen 7 5700U", "cores": 8, "threads": 16},
+      "ram_gb": 32,
+      "ram_slots": {"used": 2, "total": 2, "type": "DDR4 3200MHz SO-DIMM"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 980", "capacity_gb": 1000}
+      ],
+      "network": ["2.5GbE", "WiFi 6"],
+      "gpus": [{"model": "AMD Radeon (integrated)", "vram_gb": 0, "type": "integrated"}],
+      "motherboard": "Minisforum UM580",
+      "psu_watts": 90,
+      "role": "Home Assistant",
+      "location": "Utility room",
+      "notes": "Runs Home Assistant OS"
+    },
+    {
+      "name": "mini-pc-05",
+      "type": "mini_pc",
+      "ip": "192.168.1.105",
+      "cpu": {"model": "Intel Core i5-1240P", "cores": 12, "threads": 16},
+      "ram_gb": 32,
+      "ram_slots": {"used": 2, "total": 2, "type": "DDR4 3200MHz SO-DIMM"},
+      "storage": [
+        {"type": "nvme", "model": "WD Black SN770", "capacity_gb": 1000}
+      ],
+      "network": ["2.5GbE", "Thunderbolt 4"],
+      "gpus": [{"model": "Intel Iris Xe", "vram_gb": 0, "type": "integrated"}],
+      "motherboard": "Intel NUC 12 Pro",
+      "psu_watts": 90,
+      "role": "Remote access gateway",
+      "location": "Network closet",
+      "notes": "Runs WireGuard and Tailscale"
+    }
+  ],
+  "llm_rigs": [
+    {
+      "name": "llm-rig-01",
+      "type": "llm_rig",
+      "ip": "192.168.1.201",
+      "cpu": {"model": "AMD Ryzen 9 5950X", "cores": 16, "threads": 32},
+      "ram_gb": 128,
+      "ram_slots": {"used": 4, "total": 4, "type": "DDR4 3200MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Crucial P3 Plus", "capacity_gb": 4000}
+      ],
+      "network": ["10GbE"],
+      "gpus": [
+        {"model": "GTX 1660 Super", "vram_gb": 6},
+        {"model": "GTX 1660 Super", "vram_gb": 6}
+      ],
+      "motherboard": "ASUS PRIME B550-PLUS",
+      "psu_watts": 1000,
+      "role": "LLM inference testing",
+      "location": "Rack 2, U1-U2",
+      "notes": "Test PC for this project, 2x 1660 Super = 12GB VRAM"
+    },
+    {
+      "name": "llm-rig-02",
+      "type": "llm_rig",
+      "ip": "192.168.1.202",
+      "cpu": {"model": "AMD Ryzen 9 5950X", "cores": 16, "threads": 32},
+      "ram_gb": 128,
+      "ram_slots": {"used": 4, "total": 4, "type": "DDR4 3200MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Crucial P3 Plus", "capacity_gb": 4000}
+      ],
+      "network": ["10GbE"],
+      "gpus": [
+        {"model": "RTX 3060 Ti", "vram_gb": 8}
+      ],
+      "motherboard": "ASUS PRIME B550-PLUS",
+      "psu_watts": 750,
+      "role": "LLM inference comparison",
+      "location": "Rack 2, U3-U4",
+      "notes": "Single 3060 Ti for baseline comparison"
+    },
+    {
+      "name": "llm-rig-03",
+      "type": "llm_rig",
+      "ip": "192.168.1.203",
+      "cpu": {"model": "AMD Ryzen 9 5950X", "cores": 16, "threads": 32},
+      "ram_gb": 128,
+      "ram_slots": {"used": 4, "total": 4, "type": "DDR4 3200MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Crucial P3 Plus", "capacity_gb": 4000}
+      ],
+      "network": ["10GbE"],
+      "gpus": [
+        {"model": "RTX 3070", "vram_gb": 8}
+      ],
+      "motherboard": "ASUS PRIME B550-PLUS",
+      "psu_watts": 750,
+      "role": "LLM inference comparison",
+      "location": "Rack 2, U5-U6",
+      "notes": "Single 3070 for baseline comparison"
+    },
+    {
+      "name": "llm-rig-04",
+      "type": "llm_rig",
+      "ip": "192.168.1.204",
+      "cpu": {"model": "AMD Threadripper 3960X", "cores": 24, "threads": 48},
+      "ram_gb": 256,
+      "ram_slots": {"used": 8, "total": 8, "type": "DDR4 3600MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 990 Pro", "capacity_gb": 4000},
+        {"type": "nvme", "model": "Samsung 990 Pro", "capacity_gb": 4000}
+      ],
+      "network": ["10GbE", "10GbE"],
+      "gpus": [
+        {"model": "RTX 3090 Ti", "vram_gb": 24}
+      ],
+      "motherboard": "ASUS ROG Zenith II Extreme",
+      "psu_watts": 1200,
+      "role": "Primary LLM inference",
+      "location": "Rack 2, U7-U10",
+      "notes": "High-end single GPU config"
+    },
+    {
+      "name": "llm-rig-05",
+      "type": "llm_rig",
+      "ip": "192.168.1.205",
+      "cpu": {"model": "AMD Threadripper 3960X", "cores": 24, "threads": 48},
+      "ram_gb": 256,
+      "ram_slots": {"used": 8, "total": 8, "type": "DDR4 3600MHz"},
+      "storage": [
+        {"type": "nvme", "model": "Samsung 990 Pro", "capacity_gb": 4000},
+        {"type": "nvme", "model": "Samsung 990 Pro", "capacity_gb": 4000}
+      ],
+      "network": ["10GbE", "10GbE"],
+      "gpus": [
+        {"model": "RTX 3090 Ti", "vram_gb": 24},
+        {"model": "RTX 3060 Ti", "vram_gb": 8}
+      ],
+      "motherboard": "ASUS ROG Zenith II Extreme",
+      "psu_watts": 1600,
+      "role": "LLM inference - mixed GPU",
+      "location": "Rack 2, U11-U14",
+      "notes": "Mixed GPU config: 24GB + 8GB = 32GB total"
+    }
+  ],
+  "switches": [
+    {
+      "name": "switch-core",
+      "type": "switch",
+      "ip": "192.168.1.1",
+      "model": "MikroTik CRS317-1G-16S+RM",
+      "ports": {"sfp_plus": 16, "ethernet": 1},
+      "managed": true,
+      "poe": false,
+      "location": "Rack 1, U42",
+      "notes": "Core 10GbE switch"
+    },
+    {
+      "name": "switch-poe",
+      "type": "switch",
+      "ip": "192.168.1.2",
+      "model": "Ubiquiti UniFi Switch 24 PoE",
+      "ports": {"ethernet": 24, "sfp_plus": 2},
+      "managed": true,
+      "poe": true,
+      "poe_budget_watts": 400,
+      "location": "Rack 1, U41",
+      "notes": "PoE for cameras and access points"
+    }
+  ],
+  "spare_parts": {
+    "ram": [
+      {"type": "DDR4 ECC 3200MHz", "capacity_gb": 32, "quantity": 4, "compatible_with": ["Supermicro H12SSL-i"]},
+      {"type": "DDR4 3200MHz", "capacity_gb": 32, "quantity": 2, "compatible_with": ["ASUS PRIME B550-PLUS", "ASUS ROG Crosshair VIII"]},
+      {"type": "DDR4 ECC 2666MHz", "capacity_gb": 32, "quantity": 4, "compatible_with": ["Supermicro X11SCH-F", "Supermicro X11SCL-F"]},
+      {"type": "DDR4 3600MHz", "capacity_gb": 32, "quantity": 2, "compatible_with": ["ASUS ROG Zenith II Extreme"]},
+      {"type": "DDR5 4800MHz SO-DIMM", "capacity_gb": 16, "quantity": 2, "compatible_with": ["Intel N100 Mini PCs"]}
+    ],
+    "storage": [
+      {"type": "nvme", "model": "Samsung 970 EVO Plus", "capacity_gb": 1000, "quantity": 2},
+      {"type": "ssd", "model": "Samsung 870 EVO", "capacity_gb": 500, "quantity": 3},
+      {"type": "hdd", "model": "WD Red Plus", "capacity_gb": 8000, "quantity": 2},
+      {"type": "nvme", "model": "Crucial P3 Plus", "capacity_gb": 2000, "quantity": 1}
+    ],
+    "gpus": [
+      {"model": "GTX 1660 Super", "vram_gb": 6, "quantity": 2},
+      {"model": "RTX 3090 Ti", "vram_gb": 24, "quantity": 1}
+    ],
+    "psus": [
+      {"model": "Corsair RM850x", "watts": 850, "quantity": 1},
+      {"model": "Seasonic Focus GX-750", "watts": 750, "quantity": 1}
+    ],
+    "network": [
+      {"type": "NIC", "model": "Intel X520-DA2", "speed": "10GbE", "quantity": 2},
+      {"type": "NIC", "model": "Intel I225-V", "speed": "2.5GbE", "quantity": 3},
+      {"type": "SFP+", "model": "10GBASE-SR", "speed": "10GbE", "quantity": 8},
+      {"type": "DAC", "model": "SFP+ DAC 1m", "speed": "10GbE", "quantity": 6}
+    ],
+    "cooling": [
+      {"type": "fan", "model": "Noctua NF-A12x25", "size_mm": 120, "quantity": 4},
+      {"type": "cooler", "model": "Noctua NH-D15", "socket": "AM4/AM5", "quantity": 1}
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+# Ollama models for RTX 3060 Ti (8GB VRAM)
+# Faster than 1660 Super, slightly more VRAM
+
+# All models from 1660 Super 1x
+qwen3:0.6b
+qwen3:1.7b
+qwen3:4b
+llama3.2:1b
+llama3.2:3b
+phi4-mini:3.8b
+gemma3:1b
+gemma3:4b
+
+# Additional models for 8GB
+mistral:7b-instruct-q4_K_M
+qwen2.5:7b-instruct-q4_K_M
+llama3.1:8b-instruct-q4_K_M
+deepseek-r1:7b
+codellama:7b-instruct-q4_K_M

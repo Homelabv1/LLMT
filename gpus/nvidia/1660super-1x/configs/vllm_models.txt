@@ -1,0 +1,8 @@
+# vLLM models for GTX 1660 Super (6GB VRAM)
+# Format: HuggingFace model ID
+# Note: vLLM has ~1-2GB overhead, so max ~4GB for model
+
+Qwen/Qwen2.5-1.5B-Instruct
+meta-llama/Llama-3.2-1B-Instruct
+microsoft/Phi-3-mini-4k-instruct
+TinyLlama/TinyLlama-1.1B-Chat-v1.0

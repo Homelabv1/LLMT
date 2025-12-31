@@ -1,0 +1,11 @@
+# vLLM models for RTX 3090 Ti + RTX 3060 Ti (32GB VRAM)
+# Use pipeline parallelism for mixed GPUs: --pipeline-parallel-size 2
+# Note: Tensor parallelism works best with identical GPUs
+
+# GPTQ quantized models
+Qwen/Qwen2.5-14B-Instruct-GPTQ-Int4
+TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ
+Qwen/Qwen2.5-32B-Instruct-GPTQ-Int4
+
+# Large models with aggressive quantization
+TheBloke/Llama-2-70B-Chat-GPTQ

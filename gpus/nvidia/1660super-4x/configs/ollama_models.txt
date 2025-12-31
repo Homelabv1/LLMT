@@ -1,0 +1,24 @@
+# Ollama models for 4x GTX 1660 Super (24GB VRAM total)
+# Note: Layer split across 4 GPUs has PCIe overhead
+# vLLM with tensor parallelism may perform better
+
+# All models from 2x config
+qwen3:0.6b
+qwen3:1.7b
+qwen3:4b
+llama3.2:1b
+llama3.2:3b
+phi4-mini:3.8b
+gemma3:1b
+gemma3:4b
+mistral:7b-instruct-q4_K_M
+qwen2.5:7b-instruct-q4_K_M
+llama3.1:8b-instruct-q4_K_M
+deepseek-r1:7b
+
+# Larger models for 24GB
+qwen2.5:14b
+llama3.1:13b
+mixtral:8x7b-instruct-q4_K_M
+deepseek-r1:14b
+codellama:13b-instruct-q4_K_M

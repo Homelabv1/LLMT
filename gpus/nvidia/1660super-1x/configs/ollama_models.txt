@@ -1,0 +1,19 @@
+# Ollama models for GTX 1660 Super (6GB VRAM)
+# Models tested in order - start with smallest
+
+# Baseline (smallest)
+qwen3:0.6b
+
+# Priority models (fit in 6GB)
+qwen3:1.7b
+qwen3:4b
+llama3.2:1b
+llama3.2:3b
+phi4-mini:3.8b
+gemma3:1b
+gemma3:4b
+
+# Additional small models
+tinyllama:1.1b
+stablelm2:1.6b
+deepseek-coder:1.3b

@@ -1,0 +1,8 @@
+# vLLM models for 4x GTX 1660 Super (24GB VRAM)
+# Use with: --tensor-parallel-size 4
+
+# AWQ quantized models
+Qwen/Qwen2.5-7B-Instruct-AWQ
+Qwen/Qwen2.5-14B-Instruct-GPTQ-Int4
+TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ
+TheBloke/Llama-2-13B-Chat-AWQ

@@ -1,0 +1,13 @@
+# llama.cpp GGUF models for 4x GTX 1660 Super (24GB VRAM)
+# Use with: --tensor-split 0.25,0.25,0.25,0.25
+
+# All models from 2x config
+/models/mistral-7b-instruct-v0.2-q4_K_M.gguf
+/models/qwen2.5-7b-instruct-q4_K_M.gguf
+/models/llama-3.1-8b-instruct-q4_K_M.gguf
+
+# Larger models for 24GB
+/models/qwen2.5-14b-instruct-q4_K_M.gguf
+/models/llama-3.1-13b-instruct-q4_K_M.gguf
+/models/mixtral-8x7b-instruct-v0.1-q4_K_M.gguf
+/models/codellama-13b-instruct-q4_K_M.gguf

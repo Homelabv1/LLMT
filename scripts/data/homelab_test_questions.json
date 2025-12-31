@@ -1,0 +1,311 @@
+{
+  "version": "1.0",
+  "description": "Test questions for homelab inventory assistant evaluation",
+  "total_questions": 42,
+  "categories": {
+    "simple_lookup": 8,
+    "aggregation": 6,
+    "filtering": 6,
+    "compatibility": 6,
+    "complex_multistep": 4,
+    "natural_language": 5,
+    "inventory_management": 3,
+    "error_handling": 4
+  },
+  "questions": [
+    {
+      "q_id": 1,
+      "category": "simple_lookup",
+      "question": "What is the IP address of pve-main?",
+      "expected": "192.168.1.10",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 2,
+      "category": "simple_lookup",
+      "question": "How much RAM does the database server have?",
+      "expected": "256GB",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 3,
+      "category": "simple_lookup",
+      "question": "What CPU is in llm-rig-04?",
+      "expected": "AMD Threadripper 3960X (24 cores, 48 threads)",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 4,
+      "category": "simple_lookup",
+      "question": "What is the role of mini-pc-02?",
+      "expected": "Pi-hole DNS",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 5,
+      "category": "simple_lookup",
+      "question": "What GPUs does llm-rig-05 have?",
+      "expected": "RTX 3090 Ti (24GB) and RTX 3060 Ti (8GB)",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 6,
+      "category": "simple_lookup",
+      "question": "Where is the media server located?",
+      "expected": "Rack 1, U21",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 7,
+      "category": "simple_lookup",
+      "question": "What motherboard is in the desktop workstation?",
+      "expected": "ASUS ROG Crosshair VIII",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 8,
+      "category": "simple_lookup",
+      "question": "How many SFP+ ports does switch-core have?",
+      "expected": "16",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 9,
+      "category": "aggregation",
+      "question": "What is the total RAM across all servers?",
+      "expected": "1216GB (256+128+64+16+64+128+128+256+32+32)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 10,
+      "category": "aggregation",
+      "question": "How many devices have 10GbE networking?",
+      "expected": "12 (pve-main, pve-backup, nas-primary, k8s-master-01, k8s-worker-01, k8s-worker-02, db-server, llm-rig-01 through llm-rig-05)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 11,
+      "category": "aggregation",
+      "question": "What is the total GPU VRAM available across all LLM rigs?",
+      "expected": "76GB (6+6+8+8+24+24+8 = 76GB across llm-rig-01 to llm-rig-05)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 12,
+      "category": "aggregation",
+      "question": "How many spare GPUs are available?",
+      "expected": "3 (2x GTX 1660 Super + 1x RTX 3090 Ti)",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 13,
+      "category": "aggregation",
+      "question": "What is the total NVMe storage capacity in the database server?",
+      "expected": "16.16TB (800GB Optane + 4x 3840GB PM9A3 = 800 + 15360 = 16160GB)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 14,
+      "category": "aggregation",
+      "question": "How many systems are running in Rack 1?",
+      "expected": "11 servers plus 2 switches",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 15,
+      "category": "filtering",
+      "question": "Which systems have GPUs with more than 10GB VRAM?",
+      "expected": "k8s-worker-01 (T4 16GB), desktop-gaming (4070 Ti 12GB), llm-rig-04 (3090 Ti 24GB), llm-rig-05 (3090 Ti 24GB)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 16,
+      "category": "filtering",
+      "question": "List all systems with more than 128GB of RAM.",
+      "expected": "pve-main (256GB), db-server (256GB), llm-rig-04 (256GB), llm-rig-05 (256GB)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 17,
+      "category": "filtering",
+      "question": "Which mini PCs have dual 2.5GbE networking?",
+      "expected": "mini-pc-01, mini-pc-02, mini-pc-03 (all three N100-based units)",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 18,
+      "category": "filtering",
+      "question": "What systems use AMD EPYC CPUs?",
+      "expected": "pve-main (EPYC 7302), db-server (EPYC 7302P)",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 19,
+      "category": "filtering",
+      "question": "Which desktops have dedicated graphics cards (not integrated)?",
+      "expected": "desktop-workstation (RTX 3080), desktop-gaming (RTX 4070 Ti), desktop-guest (GTX 1650), desktop-test (RX 6600 XT)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 20,
+      "category": "filtering",
+      "question": "List systems with IPMI support.",
+      "expected": "pve-main, pve-backup, k8s-master-01, db-server, monitoring-server",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 21,
+      "category": "compatibility",
+      "question": "What RAM is compatible with the ASUS PRIME B550-PLUS motherboard?",
+      "expected": "DDR4 3200MHz 32GB modules (2 available in spare parts)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 22,
+      "category": "compatibility",
+      "question": "Can I add more RAM to llm-rig-01?",
+      "expected": "No, all 4 slots are used (4/4 slots with 128GB total)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 23,
+      "category": "compatibility",
+      "question": "What spare GPUs could I add to llm-rig-02?",
+      "expected": "2x GTX 1660 Super (6GB each) or 1x RTX 3090 Ti (24GB) from spare parts",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 24,
+      "category": "compatibility",
+      "question": "Is the spare NH-D15 cooler compatible with the desktop workstation's CPU socket?",
+      "expected": "Yes, the NH-D15 supports AM4/AM5 and the desktop-workstation uses AMD Ryzen 9 5950X (AM4)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 25,
+      "category": "compatibility",
+      "question": "What RAM would work in the Kubernetes worker nodes?",
+      "expected": "DDR4 ECC 2666MHz (compatible with Supermicro X11SCH-F), 4 spare modules available",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 26,
+      "category": "compatibility",
+      "question": "Can I use the spare 10GbE NICs with switch-core?",
+      "expected": "Yes, the Intel X520-DA2 is SFP+ and switch-core has 16 SFP+ ports. Use with 10GBASE-SR modules or DAC cables.",
+      "difficulty": "hard"
+    },
+    {
+      "q_id": 27,
+      "category": "complex_multistep",
+      "question": "If I want to build a new LLM rig with maximum GPU VRAM from spare parts, what would the configuration be?",
+      "expected": "Use the spare RTX 3090 Ti (24GB) for maximum single-GPU VRAM, or combine with 2x GTX 1660 Super for 36GB total (but mixed GPU performance considerations)",
+      "difficulty": "hard"
+    },
+    {
+      "q_id": 28,
+      "category": "complex_multistep",
+      "question": "What is the highest RAM capacity system I could upgrade using spare parts?",
+      "expected": "pve-backup has 4/8 slots used with 128GB, could add 4x 32GB DDR4 ECC 3200MHz spare modules (if compatible with Supermicro X10SRH-CF - need to verify ECC 3200 vs 2400 compatibility)",
+      "difficulty": "hard"
+    },
+    {
+      "q_id": 29,
+      "category": "complex_multistep",
+      "question": "Which system would be best for running a 70B parameter LLM model?",
+      "expected": "llm-rig-05 with 32GB total VRAM (3090 Ti 24GB + 3060 Ti 8GB) would be best. Could also use llm-rig-04 with 24GB for smaller quantized versions.",
+      "difficulty": "hard"
+    },
+    {
+      "q_id": 30,
+      "category": "complex_multistep",
+      "question": "What is the total power supply capacity across all LLM rigs?",
+      "expected": "5300W (1000+750+750+1200+1600 watts)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 31,
+      "category": "natural_language",
+      "question": "Got anything beefy for running big AI models?",
+      "expected": "llm-rig-04 and llm-rig-05 are the most capable: rig-04 has RTX 3090 Ti (24GB), rig-05 has 3090 Ti + 3060 Ti (32GB total). Both have Threadripper CPUs and 256GB RAM.",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 32,
+      "category": "natural_language",
+      "question": "What's good for transcoding videos?",
+      "expected": "media-server has Intel Core i5-12400 with Intel UHD 730 integrated graphics supporting Quick Sync for hardware transcoding",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 33,
+      "category": "natural_language",
+      "question": "I need something quiet for the living room. Any suggestions?",
+      "expected": "desktop-htpc (ASRock DeskMini X300 with Ryzen 5 5600G, low 120W PSU) or desktop-gaming if performance is needed",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 34,
+      "category": "natural_language",
+      "question": "Where's all my backup storage?",
+      "expected": "pve-backup has 128TB HDD storage (8x 16TB Seagate Exos), nas-primary has ~108TB (6x 18TB in RAID-Z2), nas-offsite has 32TB (4x 8TB)",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 35,
+      "category": "natural_language",
+      "question": "What can handle a sudden traffic spike to my home lab services?",
+      "expected": "k8s-worker-01 and k8s-worker-02 are Kubernetes workers that can scale. db-server has high-speed Optane storage for database performance.",
+      "difficulty": "hard"
+    },
+    {
+      "q_id": 36,
+      "category": "inventory_management",
+      "question": "If I move one GTX 1660 Super from spare parts to llm-rig-02, what changes?",
+      "expected": "llm-rig-02 would have RTX 3060 Ti + GTX 1660 Super (14GB total VRAM). Spare GPUs would be: 1x GTX 1660 Super, 1x RTX 3090 Ti",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 37,
+      "category": "inventory_management",
+      "question": "What happens if I want to add the spare RTX 3090 Ti to llm-rig-01?",
+      "expected": "llm-rig-01 would have 2x GTX 1660 Super + RTX 3090 Ti (36GB total), but may need PSU upgrade (currently 1000W). Mixed GPU configs need pipeline parallelism.",
+      "difficulty": "hard"
+    },
+    {
+      "q_id": 38,
+      "category": "inventory_management",
+      "question": "If nas-primary fails, what's my backup storage situation?",
+      "expected": "pve-backup has 128TB HDD for Proxmox backups, nas-offsite has 32TB for offsite replication. Total backup capacity: 160TB",
+      "difficulty": "medium"
+    },
+    {
+      "q_id": 39,
+      "category": "error_handling",
+      "question": "What is the IP address of web-server-01?",
+      "expected": "Not found in inventory - no system named web-server-01 exists",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 40,
+      "category": "error_handling",
+      "question": "How much VRAM does pve-main have?",
+      "expected": "pve-main has no GPUs installed",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 41,
+      "category": "error_handling",
+      "question": "What is the WiFi password for the home network?",
+      "expected": "Not available in inventory - this inventory tracks hardware, not network credentials",
+      "difficulty": "easy"
+    },
+    {
+      "q_id": 42,
+      "category": "error_handling",
+      "question": "Can I upgrade the RAM in the Intel N100 mini PCs?",
+      "expected": "Limited - they have 1/1 RAM slot used. The DDR5 4800MHz SO-DIMM spare modules are compatible but would require replacing existing RAM, not adding to it.",
+      "difficulty": "medium"
+    }
+  ]
+}

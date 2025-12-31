@@ -1,0 +1,13 @@
+# llama.cpp GGUF models for RTX 3090 Ti (24GB VRAM)
+
+# Medium models
+/models/mistral-7b-instruct-v0.2-q4_K_M.gguf
+/models/qwen2.5-7b-instruct-q4_K_M.gguf
+/models/llama-3.1-8b-instruct-q4_K_M.gguf
+
+# Larger models for 24GB
+/models/qwen2.5-14b-instruct-q4_K_M.gguf
+/models/llama-3.1-13b-instruct-q4_K_M.gguf
+/models/mixtral-8x7b-instruct-v0.1-q4_K_M.gguf
+/models/qwen2.5-32b-instruct-q4_K_M.gguf
+/models/codellama-34b-instruct-q4_K_M.gguf

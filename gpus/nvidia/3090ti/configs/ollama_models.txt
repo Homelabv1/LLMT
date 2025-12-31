@@ -1,0 +1,26 @@
+# Ollama models for RTX 3090 Ti (24GB VRAM)
+# High-end single GPU, can run 13B+ models
+
+# All models from 8GB cards
+qwen3:0.6b
+qwen3:1.7b
+qwen3:4b
+llama3.2:1b
+llama3.2:3b
+phi4-mini:3.8b
+gemma3:1b
+gemma3:4b
+mistral:7b-instruct-q4_K_M
+qwen2.5:7b-instruct-q4_K_M
+llama3.1:8b-instruct-q4_K_M
+deepseek-r1:7b
+
+# Larger models for 24GB
+qwen2.5:14b
+llama3.1:13b
+mixtral:8x7b-instruct-q4_K_M
+qwen2.5:32b-instruct-q4_K_M
+deepseek-r1:14b
+deepseek-r1:32b
+codellama:13b-instruct-q4_K_M
+codellama:34b-instruct-q4_K_M

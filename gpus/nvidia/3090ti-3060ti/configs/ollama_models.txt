@@ -1,0 +1,27 @@
+# Ollama models for RTX 3090 Ti + RTX 3060 Ti (32GB VRAM total)
+# Mixed GPUs - use llama.cpp with --tensor-split 0.75,0.25
+# vLLM: use pipeline parallelism (--pipeline-parallel-size 2)
+# Power limit recommended: 3090 Ti = 280W, 3060 Ti = 160W
+
+# All models from 3090 Ti config
+qwen3:0.6b
+qwen3:1.7b
+qwen3:4b
+llama3.2:1b
+llama3.2:3b
+phi4-mini:3.8b
+gemma3:1b
+gemma3:4b
+mistral:7b-instruct-q4_K_M
+qwen2.5:7b-instruct-q4_K_M
+llama3.1:8b-instruct-q4_K_M
+deepseek-r1:7b
+qwen2.5:14b
+llama3.1:13b
+mixtral:8x7b-instruct-q4_K_M
+qwen2.5:32b-instruct-q4_K_M
+
+# Larger models for 32GB combined
+llama3.1:70b-instruct-q4_K_M
+qwen2.5:72b-instruct-q3_K_M
+deepseek-r1:70b
