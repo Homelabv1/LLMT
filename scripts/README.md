@@ -6,8 +6,9 @@ This directory contains the core testing framework scripts.
 
 | Script | Description |
 |--------|-------------|
+| `preflight_check.py` | Pre-flight validation (connectivity, models, VRAM) |
 | `run_test.py` | Single model test runner |
-| `batch_test.py` | Batch test runner with cooldown |
+| `batch_test.py` | Batch test runner with cooldown and preflight |
 | `analyze_results.py` | Results analysis and comparison |
 | `score_results.py` | Interactive manual scoring |
 | `llamacpp_batch.sh` | llama.cpp container management |
@@ -21,11 +22,14 @@ pip install -r requirements.txt
 ## Quick Start
 
 ```bash
+# Pre-flight check
+python preflight_check.py --engine ollama --config models.txt
+
 # Single model test
 python run_test.py --engine ollama --model qwen3:4b
 
-# Batch test
-python batch_test.py --engine ollama --config models.txt
+# Batch test with preflight
+python batch_test.py --engine ollama --config models.txt --preflight
 
 # Analyze results
 python analyze_results.py results/ --compare
@@ -40,6 +44,8 @@ python score_results.py results/
 |----------|---------|-------------|
 | `CUDA_VISIBLE_DEVICES` | all | GPUs to use |
 | `OLLAMA_URL` | localhost:11434 | Ollama server URL |
+| `LLAMACPP_URL` | localhost:8080 | llama.cpp server URL |
+| `VLLM_URL` | localhost:8000 | vLLM server URL |
 
 ## Exit Codes
 
@@ -53,6 +59,7 @@ python score_results.py results/
 
 ```
 scripts/
+├── preflight_check.py   # Pre-flight validation CLI
 ├── run_test.py          # Single model testing
 ├── batch_test.py        # Batch testing with cooldown
 ├── analyze_results.py   # Results analysis
@@ -60,15 +67,21 @@ scripts/
 ├── llamacpp_batch.sh    # llama.cpp wrapper
 ├── requirements.txt     # Python dependencies
 ├── core/                # Core modules
+│   ├── __init__.py      # Module exports
+│   ├── preflight.py     # Pre-flight check logic
 │   ├── questions.py     # Question loading
 │   ├── results.py       # Results handling
 │   ├── metrics.py       # GPU monitoring
-│   └── runner.py        # Test execution
+│   ├── runner.py        # Test execution
+│   ├── config.py        # Configuration
+│   ├── validation.py    # Input validation
+│   └── logging_config.py # Logging setup
 ├── engines/             # Engine adapters
+│   ├── __init__.py      # Module exports
 │   ├── ollama.py        # Ollama adapter
 │   ├── llamacpp.py      # llama.cpp adapter
 │   └── vllm.py          # vLLM adapter
-└── data/                # Test data
+└── data/                # Test data (100 questions)
     ├── homelab_inventory.json
     └── homelab_test_questions.json
 ```

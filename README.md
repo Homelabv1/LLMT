@@ -2,6 +2,23 @@
 
 A production-ready testing framework for evaluating and benchmarking small language models across different GPU configurations. Built for Proxmox VE environments with GPU passthrough to LXC containers, designed for testing models on consumer GPUs (starting with 6GB VRAM GTX 1660 Super) to find optimal models before fine-tuning.
 
+## Table of Contents
+
+- [Test Environment](#test-environment)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Directory Structure](#directory-structure)
+- [Supported GPU Configurations](#supported-gpu-configurations)
+- [Supported Models](#supported-models)
+- [Test Questions](#test-questions)
+- [Scoring System](#scoring-system)
+- [CLI Reference](#cli-reference)
+- [Engine-Specific Notes](#engine-specific-notes)
+- [Hardware Requirements](#hardware-requirements)
+- [Documentation](#documentation)
+- [License](#license)
+
 ## Test Environment
 
 - **Host**: Proxmox VE with NVIDIA drivers
@@ -13,10 +30,11 @@ A production-ready testing framework for evaluating and benchmarking small langu
 
 - **Multi-Engine Support**: Test with Ollama, llama.cpp, or vLLM
 - **Multi-GPU Configurations**: Support for 1x, 2x, 4x GPU setups and mixed GPU configs
+- **Pre-flight Checks**: Validate model availability and engine connectivity before testing
 - **Resumable Testing**: Graceful shutdown with Ctrl+C, resume from last completed question
 - **GPU Metrics**: Real-time VRAM, utilization, and temperature monitoring
 - **Dynamic Cooldown**: Temperature-based cooldown between models
-- **Scoring System**: Interactive manual scoring with 0-3 scale
+- **Scoring System**: Interactive manual scoring with 0-3 scale (max 300 points for 100 questions)
 - **Power Management**: Optional power limiting for thermal management
 
 ## Quick Start
@@ -165,6 +183,39 @@ llm-testing/
 | RTX 3090 Ti | 24GB | Up to 32B+ Q4 | Phase 3 |
 | 3090 Ti + 3060 Ti | 32GB | Up to 70B Q4 | Phase 4 |
 
+## Supported Models
+
+Models are organized by priority tier for 6GB VRAM testing:
+
+### Tier 1 - Priority (December 2025)
+
+| Model | Parameters | VRAM (Q4) | Key Features |
+|-------|------------|-----------|--------------|
+| SmolLM3-3B | 3B | ~2.2GB | Dual-mode reasoning, 128K context |
+| Granite 4.0-H-Tiny | 7B (1B active) | ~1.5GB | Mamba-2 hybrid, 70% less RAM |
+| Granite 4.0-H-Micro | 3B | ~2GB | Dense hybrid, tool calling |
+| Qwen3-4B | 4B | ~2.5GB | 256K context, mature ecosystem |
+| Gemma 3 4B | 4B | ~2GB | QAT optimized, multimodal |
+
+### Tier 2 - Strong Candidates
+
+| Model | Parameters | VRAM (Q4) | Key Features |
+|-------|------------|-----------|--------------|
+| Ministral 3B | 3.4B | ~2.5GB | Edge-optimized, function calling |
+| Llama 3.2 3B | 3B | ~2GB | Meta baseline |
+| Phi-4 Mini | 3.8B | ~2.2GB | Microsoft efficient model |
+
+### Tier 3 - Baselines
+
+| Model | Parameters | VRAM (Q4) | Purpose |
+|-------|------------|-----------|---------|
+| Qwen3-1.7B | 1.7B | ~1.2GB | Mid-size baseline |
+| Qwen3-0.6B | 0.6B | ~0.5GB | Speed baseline |
+| Granite Nano 1B | 1B | ~0.8GB | Edge optimized |
+| TinyLlama 1.1B | 1.1B | ~0.8GB | Legacy baseline |
+
+See [docs/MODEL_RESEARCH.md](docs/MODEL_RESEARCH.md) for detailed model analysis.
+
 ## Test Questions
 
 The framework includes 100 sample test questions for a **homelab inventory assistant** use case, covering 8 categories:
@@ -201,6 +252,19 @@ python scripts/score_results.py gpus/nvidia/1660super-1x/results/ollama/ export
 
 ## CLI Reference
 
+### preflight_check.py
+```
+python preflight_check.py --engine ENGINE [options]
+  --engine, -e     Engine: ollama, llamacpp, vllm
+  --all-engines    Check all engines
+  --config, -c     Path to model config file
+  --models, -m     Specific model names to check
+  --gpu-config     GPU config directory
+  --full           Include load test (loads model, sends test prompt)
+  --json           Output results as JSON
+  --skip-vram-check   Skip VRAM estimation
+```
+
 ### run_test.py
 ```
 python run_test.py --engine ENGINE --model MODEL [options]
@@ -210,6 +274,8 @@ python run_test.py --engine ENGINE --model MODEL [options]
   --results-dir    Results directory
   --max-tokens     Max tokens (default: 512)
   --temperature    Temperature (default: 0.1)
+  --download-timeout  Download timeout (default: 1800s)
+  --load-timeout   Load timeout (default: 600s)
 ```
 
 ### batch_test.py
@@ -222,6 +288,9 @@ python batch_test.py --engine ENGINE --config FILE [options]
   --target-temp    Target temp in C (default: 50)
   --status         Show progress only
   --power-limit    Power limits per GPU (e.g., "280,160")
+  --preflight      Run pre-flight checks before testing
+  --preflight-full Run full pre-flight including load tests
+  --preflight-only Only run pre-flight, skip tests
 ```
 
 ### analyze_results.py
@@ -230,6 +299,8 @@ python analyze_results.py RESULTS_DIR [options]
   --detail         Detailed breakdown
   --compare        Compare multiple runs
   --export FILE    Export to CSV
+  --by-category    Break down by question category
+  --json           Output as JSON
 ```
 
 ## Engine-Specific Notes
@@ -290,10 +361,21 @@ See [docs/USAGE.md](docs/USAGE.md) for detailed vLLM tuning guide.
 | GPU VRAM | 6GB | 8GB+ |
 | Storage | 500GB SSD | 2TB+ NVMe |
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [SETUP.md](docs/SETUP.md) | Environment setup (Proxmox, LXC, Docker, engines) |
+| [USAGE.md](docs/USAGE.md) | Usage guide, CLI reference, vLLM tuning |
+| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues and solutions |
+| [MODEL_RESEARCH.md](docs/MODEL_RESEARCH.md) | December 2025 model research notes |
+| [CONTRIBUTING.md](docs/CONTRIBUTING.md) | Contribution guidelines |
+| [CONFIG_AUDIT_REPORT.md](docs/CONFIG_AUDIT_REPORT.md) | Model config inheritance validation |
+
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
-Contributions welcome! Please see docs/CONTRIBUTING.md for guidelines.
+Contributions welcome! Please see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.

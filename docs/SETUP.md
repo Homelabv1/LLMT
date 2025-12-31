@@ -240,6 +240,25 @@ curl -s http://localhost:11434/api/version 2>/dev/null | grep -o '"version":"[^"
 echo "=== Done ==="
 ```
 
+### Framework Verification
+
+After prerequisites are confirmed, verify the testing framework:
+
+```bash
+# Run pre-flight check on Ollama
+python scripts/preflight_check.py --engine ollama --models qwen3:4b
+
+# Expected output:
+# === Pre-flight Check: Ollama ===
+# Engine Connectivity:
+#   ✓ Connected to http://localhost:11434 (Ollama v0.5.x)
+# Model Availability:
+#   ✓ qwen3:4b [READY - CACHED] or [NEEDS DOWNLOAD]
+
+# Run a single test to verify everything works
+python scripts/run_test.py --engine ollama --model qwen3:4b --dry-run
+```
+
 ## Multi-GPU Setup Notes
 
 ### Identical GPUs (2x or 4x)

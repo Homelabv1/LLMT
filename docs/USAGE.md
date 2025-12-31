@@ -2,6 +2,112 @@
 
 This guide covers common workflows for the LLM Testing Framework.
 
+## Quick Reference
+
+```bash
+# Pre-flight check before testing
+python scripts/preflight_check.py --engine ollama --config models.txt
+
+# Single model test
+python scripts/run_test.py --engine ollama --model qwen3:4b
+
+# Batch test with pre-flight
+python scripts/batch_test.py --engine ollama --config models.txt --preflight
+
+# Check status
+python scripts/batch_test.py --config models.txt --status
+
+# Score results
+python scripts/score_results.py results/ollama/
+
+# Analyze and compare
+python scripts/analyze_results.py results/ollama/ --compare
+```
+
+## Pre-flight Checks
+
+Before running tests, use the pre-flight system to validate model availability and engine connectivity.
+
+### Standalone Pre-flight
+
+```bash
+# Check all models in a config file
+python scripts/preflight_check.py --engine ollama --config gpus/nvidia/1660super-1x/configs/ollama_models.txt
+
+# Check specific models
+python scripts/preflight_check.py --engine ollama --models qwen3:4b llama3.2:3b smollm3:3b
+
+# Full check including load test (loads model, sends test prompt)
+python scripts/preflight_check.py --engine ollama --config models.txt --full
+
+# Check all engines for a GPU config
+python scripts/preflight_check.py --all-engines --gpu-config gpus/nvidia/1660super-1x/
+
+# JSON output for scripting
+python scripts/preflight_check.py --engine ollama --config models.txt --json
+```
+
+### Pre-flight CLI Options
+
+| Flag | Description |
+|------|-------------|
+| `--engine`, `-e` | Engine to check: ollama, llamacpp, vllm |
+| `--all-engines` | Check all engines |
+| `--config`, `-c` | Path to model config file |
+| `--models`, `-m` | Specific model names to check |
+| `--gpu-config`, `-g` | GPU config directory (checks all engines) |
+| `--full`, `-f` | Include load test (loads model, sends test prompt) |
+| `--dry-run` | Show what would be checked without checking |
+| `--json`, `-j` | Output results as JSON |
+| `--quiet`, `-q` | Only show summary and errors |
+| `--url`, `-u` | Override engine URL |
+| `--timeout`, `-t` | Timeout for connectivity checks (seconds) |
+| `--skip-disk-check` | Skip disk space verification |
+| `--skip-vram-check` | Skip VRAM estimation check |
+| `--models-dir` | Models directory for llama.cpp (default: /models) |
+
+### Pre-flight Output Example
+
+```
+=== Pre-flight Check: Ollama ===
+
+Engine Connectivity:
+  ✓ Connected to http://localhost:11434 (Ollama v0.5.4)
+
+Model Availability:
+  ✓ qwen3:4b          [READY - CACHED]     VRAM: ~2.5GB
+  ✓ smollm3:3b        [READY - CACHED]     VRAM: ~2.2GB
+  ⚠ llama3.2:3b       [NEEDS DOWNLOAD]     Size: 1.9GB
+  ✗ invalid-model:1b  [NOT FOUND]
+
+Summary: 2 ready, 1 needs download, 1 failed
+Overall: WARNING - Some models need download
+```
+
+### Integrated Pre-flight in Batch Testing
+
+```bash
+# Run pre-flight before starting tests
+python scripts/batch_test.py --engine ollama --config models.txt --preflight
+
+# Full pre-flight with load tests
+python scripts/batch_test.py --engine ollama --config models.txt --preflight-full
+
+# Only run pre-flight, don't start tests
+python scripts/batch_test.py --engine ollama --config models.txt --preflight-only
+
+# Skip VRAM estimation (faster)
+python scripts/batch_test.py --engine ollama --config models.txt --preflight --skip-preflight-vram
+```
+
+### Pre-flight Check Levels
+
+| Level | What's Checked | When to Use |
+|-------|----------------|-------------|
+| Basic | Engine connectivity, model existence | Quick validation |
+| Standard | + VRAM estimation, disk space | Before batch runs |
+| Full (`--full`) | + Load model, send test prompt | First-time setup |
+
 ## Single Model Testing
 
 ### Basic Test
@@ -327,17 +433,66 @@ export CUDA_VISIBLE_DEVICES=0,1
 ### Full Benchmark Cycle
 
 ```bash
-# 1. Run all models
-python scripts/batch_test.py --engine ollama --config models.txt
+# 1. Pre-flight check
+python scripts/preflight_check.py --engine ollama --config models.txt
 
-# 2. Score results
+# 2. Run all models with pre-flight
+python scripts/batch_test.py --engine ollama --config models.txt --preflight
+
+# 3. Score results interactively
 python scripts/score_results.py results/ollama/
 
-# 3. Analyze and export
+# 4. Analyze and export
 python scripts/analyze_results.py results/ollama/ --compare --export results.csv
 
-# 4. View summary
+# 5. View final summary
 python scripts/score_results.py results/ollama/ summary
+```
+
+## Output Files
+
+### Results Directory Structure
+
+```
+gpus/nvidia/1660super-1x/results/ollama/
+├── qwen3-4b/
+│   ├── run_metadata.json      # Test run configuration
+│   ├── questions.jsonl        # Per-question results (append-only)
+│   └── scores.json            # Manual scoring data
+├── smollm3-3b/
+│   ├── run_metadata.json
+│   ├── questions.jsonl
+│   └── scores.json
+└── failures.log               # Model load failures
+```
+
+### File Formats
+
+**run_metadata.json** - Test configuration:
+```json
+{
+  "model": "qwen3:4b",
+  "engine": "ollama",
+  "gpu": "1660super-1x",
+  "started_at": "2025-12-30T14:30:00",
+  "questions_file": "homelab_test_questions.json",
+  "total_questions": 100
+}
+```
+
+**questions.jsonl** - Per-question results (one JSON object per line):
+```json
+{"q_id": 1, "question": "What is...", "response": "The answer...", "latency_ms": 523, "tokens": 48, "timestamp": "..."}
+```
+
+**scores.json** - Manual scoring data:
+```json
+{
+  "scores": {"1": 3, "2": 2, "3": 3, ...},
+  "total": 285,
+  "max_possible": 300,
+  "scored_count": 100
+}
 ```
 
 ## vLLM Memory Tuning for Low VRAM GPUs
