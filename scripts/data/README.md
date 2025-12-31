@@ -19,18 +19,18 @@ A sample dataset representing a homelab infrastructure. This serves as example c
 
 ### homelab_test_questions.json
 
-42 sample test questions across 8 categories:
+100 sample test questions across 8 categories:
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| simple_lookup | 8 | Direct information retrieval |
-| aggregation | 6 | Sum/count operations |
-| filtering | 6 | Conditional logic |
-| compatibility | 6 | Relationship reasoning |
-| complex_multistep | 4 | Chained reasoning |
-| natural_language | 5 | Informal query variations |
-| inventory_management | 3 | Change scenarios |
-| error_handling | 4 | Missing/invalid data |
+| simple_lookup | 15 | Direct information retrieval |
+| aggregation | 14 | Sum/count operations |
+| filtering | 14 | Conditional logic |
+| compatibility | 12 | Relationship reasoning |
+| complex_multistep | 12 | Chained reasoning |
+| natural_language | 14 | Informal query variations |
+| inventory_management | 10 | Change scenarios |
+| error_handling | 9 | Missing/invalid data |
 
 ## Schema
 
