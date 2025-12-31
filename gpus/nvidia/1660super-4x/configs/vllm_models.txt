@@ -1,8 +1,50 @@
 # vLLM models for 4x GTX 1660 Super (24GB VRAM)
 # Use with: --tensor-parallel-size 4
+# Updated: December 2025
 
-# AWQ quantized models
+# =============================================================================
+# INHERITED FROM 1660super-2x (12GB) - ALL MODELS MUST BE INCLUDED
+# =============================================================================
+
+# --- From 1x (6GB) ---
+
+# AWQ/GPTQ quantized models
+Qwen/Qwen2.5-3B-Instruct-AWQ
+Qwen/Qwen3-4B-AWQ
+google/gemma-3-4b-it-gptq-int4
+microsoft/Phi-3-mini-4k-instruct-awq
+
+# FP16 small models
+Qwen/Qwen2.5-1.5B-Instruct
+meta-llama/Llama-3.2-1B-Instruct
+TinyLlama/TinyLlama-1.1B-Chat-v1.0
+HuggingFaceTB/SmolLM2-1.7B-Instruct
+
+# --- From 2x (12GB) ---
+
+# AWQ/GPTQ 7B models
 Qwen/Qwen2.5-7B-Instruct-AWQ
+TheBloke/Mistral-7B-Instruct-v0.2-AWQ
+TheBloke/Llama-2-7B-Chat-AWQ
+TheBloke/CodeLlama-7B-Instruct-AWQ
+
+# FP16 3B models
+Qwen/Qwen2.5-3B-Instruct
+meta-llama/Llama-3.2-3B-Instruct
+
+# =============================================================================
+# NEW MODELS FOR 24GB VRAM
+# =============================================================================
+
+# GPTQ/AWQ 13-14B models
 Qwen/Qwen2.5-14B-Instruct-GPTQ-Int4
-TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ
 TheBloke/Llama-2-13B-Chat-AWQ
+TheBloke/CodeLlama-13B-Instruct-GPTQ
+
+# Large MoE models (quantized)
+TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ
+
+# FP16 7B models (comfortable with 24GB)
+Qwen/Qwen2.5-7B-Instruct
+meta-llama/Llama-3.1-8B-Instruct
+mistralai/Mistral-7B-Instruct-v0.2

@@ -1,12 +1,39 @@
 # llama.cpp GGUF models for RTX 3060 Ti (8GB VRAM)
+# Updated: December 2025
 
-# Smaller models
-/models/qwen2.5-3b-instruct-q4_K_M.gguf
+# =============================================================================
+# INHERITED FROM 1660super-1x (6GB) - ALL MODELS MUST BE INCLUDED
+# =============================================================================
+
+# Tier 1 - Priority models
+/models/smollm3-3b-q4_K_M.gguf
+/models/granite-4.0-tiny-q4_K_M.gguf
+/models/granite-4.0-micro-q4_K_M.gguf
+/models/qwen3-4b-q4_K_M.gguf
+/models/gemma-3-4b-it-q4_K_M.gguf
+
+# Tier 2 - Strong candidates
+/models/ministral-3b-instruct-q4_K_M.gguf
 /models/llama-3.2-3b-instruct-q4_K_M.gguf
 /models/phi-4-mini-instruct-q4_K_M.gguf
+/models/gemma-2-2b-it-q4_K_M.gguf
 
-# 7B models (fit in 8GB)
+# Tier 3 - Baseline/experimental
+/models/qwen3-1.7b-q4_K_M.gguf
+/models/qwen3-0.6b-q4_K_M.gguf
+/models/granite-4.0-nano-1b-q4_K_M.gguf
+/models/tinyllama-1.1b-chat-v1.0-q4_K_M.gguf
+
+# =============================================================================
+# ADDITIONAL MODELS FOR 8GB VRAM
+# =============================================================================
+
+# 7B models fit in 8GB
 /models/mistral-7b-instruct-v0.2-q4_K_M.gguf
 /models/qwen2.5-7b-instruct-q4_K_M.gguf
 /models/llama-3.1-8b-instruct-q4_K_M.gguf
 /models/codellama-7b-instruct-q4_K_M.gguf
+/models/deepseek-r1-7b-q4_K_M.gguf
+
+# Additional 3B variant
+/models/qwen2.5-3b-instruct-q4_K_M.gguf
