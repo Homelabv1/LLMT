@@ -1,6 +1,13 @@
 # Local LLM Testing Framework
 
-A production-ready testing framework for evaluating and benchmarking small language models across different GPU configurations. Designed for testing models on consumer GPUs (starting with 6GB VRAM GTX 1660 Super) to find optimal models before fine-tuning.
+A production-ready testing framework for evaluating and benchmarking small language models across different GPU configurations. Built for Proxmox VE environments with GPU passthrough to LXC containers, designed for testing models on consumer GPUs (starting with 6GB VRAM GTX 1660 Super) to find optimal models before fine-tuning.
+
+## Test Environment
+
+- **Host**: Proxmox VE with NVIDIA drivers
+- **Containers**: LXC with GPU passthrough
+- **Inference**: Docker containers (Ollama, llama.cpp, vLLM)
+- **Storage**: Shared NVMe mount for models across containers
 
 ## Features
 
@@ -16,16 +23,27 @@ A production-ready testing framework for evaluating and benchmarking small langu
 
 ### 1. Prerequisites
 
-```bash
-# Python 3.9+ with requests
-pip install -r scripts/requirements.txt
+**Proxmox Host:**
+- Proxmox VE 8.x with NVIDIA drivers installed
+- GPU passthrough configured for LXC containers
 
-# Verify GPU access
+**LXC Container:**
+- Ubuntu 22.04/24.04 with GPU access
+- Docker with NVIDIA Container Toolkit
+- Python 3.9+
+
+```bash
+# In LXC container - verify GPU passthrough
 nvidia-smi
+
+# Install Python dependencies
+pip install -r scripts/requirements.txt
 
 # Start Ollama (Docker)
 docker run -d --gpus all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
 ```
+
+See [docs/SETUP.md](docs/SETUP.md) for detailed Proxmox and LXC configuration.
 
 ### 2. Run Single Model Test
 
