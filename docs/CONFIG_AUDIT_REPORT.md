@@ -1,200 +1,156 @@
 # Model Configuration Audit Report
 
 **Date**: December 2025
-**Auditor**: Automated audit script
-**Status**: Issues Found - Fixes Applied
+**Status**: ✅ All Issues Resolved
 
 ## Audit Scope
 
-This audit verifies that model configuration files follow the inheritance rule:
-- **1x GPU models ⊆ 2x GPU models ⊆ 4x GPU models**
-- Larger VRAM configurations must include ALL models from smaller configurations
+This audit verifies that model configuration files follow inheritance rules:
+- **Within-GPU Multiplicity**: 1x ⊆ 2x ⊆ 4x
+- **Cross-GPU VRAM**: Smaller VRAM configs ⊆ Larger VRAM configs
 
 ## GPU Configuration Hierarchy
 
 ```
-1660super-1x (6GB)
-    └── 1660super-2x (12GB)
-            └── 1660super-4x (24GB)
+Within-GPU Multiplicity (1660 Super):
+    1660super-1x (6GB)
+        └── 1660super-2x (12GB)
+                └── 1660super-4x (24GB)
 
-1660super-1x (6GB)
-    └── 3060ti (8GB) ≈ 3070 (8GB)
-            └── 3090ti (24GB)
-                    └── 3090ti-3060ti (32GB)
+Cross-GPU VRAM Inheritance:
+    1660super-1x (6GB)
+        └── 3060ti (8GB) ≈ 3070 (8GB)
+                └── 3090ti (24GB)
+                        └── 3090ti-3060ti (32GB)
 ```
 
 ---
 
-## Ollama Configuration Issues
+## Audit Results by Engine
 
-### 1660super-2x (12GB)
+### Ollama
 
-**Missing models from 1660super-1x:**
-| Model | Priority | Notes |
-|-------|----------|-------|
-| smollm3:3b | Tier 1 | Dual-mode reasoning |
-| granite4-tiny:latest | Tier 1 | Hybrid architecture |
-| granite4-micro:latest | Tier 1 | Dense hybrid |
-| ministral:3b | Tier 2 | Function calling |
-| granite4-nano:1b | Tier 3 | Edge optimized |
-| granite4-nano:350m | Tier 3 | Smallest |
-| tinyllama:1.1b | Tier 3 | Legacy baseline |
-| stablelm2:1.6b | Tier 3 | Legacy |
-| deepseek-coder:1.3b | Tier 3 | Code model |
+| Configuration | Status | Models | Inherits From |
+|---------------|--------|--------|---------------|
+| 1660super-1x | ✅ | 20 | Base config |
+| 1660super-2x | ✅ | 26 | 1660super-1x |
+| 1660super-4x | ✅ | 33 | 1660super-2x |
+| 3060ti | ✅ | 26 | 1660super-1x |
+| 3070 | ✅ | 26 | 1660super-1x (same VRAM as 3060ti) |
+| 3090ti | ✅ | 33 | 3060ti/3070 |
+| 3090ti-3060ti | ✅ | 39 | 3090ti |
 
-### 1660super-4x (24GB)
+### llama.cpp (GGUF)
 
-**Missing models from 1660super-2x:**
-| Model | Notes |
-|-------|-------|
-| codellama:7b-instruct-q4_K_M | Present in 2x but missing in 4x |
-| *All models missing from 2x* | Cascading inheritance issue |
+| Configuration | Status | Models | Inherits From |
+|---------------|--------|--------|---------------|
+| 1660super-1x | ✅ | 13 | Base config |
+| 1660super-2x | ✅ | 19 | 1660super-1x |
+| 1660super-4x | ✅ | 27 | 1660super-2x |
+| 3060ti | ✅ | 19 | 1660super-1x |
+| 3070 | ✅ | 19 | 1660super-1x (same VRAM as 3060ti) |
+| 3090ti | ✅ | 28 | 3060ti/3070 |
+| 3090ti-3060ti | ✅ | 31 | 3090ti |
 
-### 3060ti (8GB) / 3070 (8GB)
+### vLLM (HuggingFace)
 
-**Missing models from 1660super-1x:**
-| Model | Priority |
-|-------|----------|
-| smollm3:3b | Tier 1 |
-| granite4-tiny:latest | Tier 1 |
-| granite4-micro:latest | Tier 1 |
-| ministral:3b | Tier 2 |
-| granite4-nano:1b | Tier 3 |
-| granite4-nano:350m | Tier 3 |
-| tinyllama:1.1b | Tier 3 |
-| stablelm2:1.6b | Tier 3 |
-| deepseek-coder:1.3b | Tier 3 |
-
-### 3090ti (24GB)
-
-**Missing models:**
-- codellama:7b-instruct-q4_K_M (should inherit from 8GB cards)
-- All models missing from 3060ti/3070
-
-### 3090ti-3060ti (32GB)
-
-**Missing models:**
-- deepseek-r1:14b (present in 4x but not in 3090ti config)
-- codellama:13b-instruct-q4_K_M (present in 4x but not in 3090ti config)
-- codellama:34b-instruct-q4_K_M (present in 3090ti but not in mixed config)
-- All models missing from 3090ti
-
----
-
-## llama.cpp Configuration Issues
-
-### 1660super-2x (12GB)
-
-**Missing models from 1660super-1x:**
-| Model | Notes |
-|-------|-------|
-| /models/smollm3-3b-q4_K_M.gguf | Priority model |
-| /models/granite-4.0-tiny-q4_K_M.gguf | Hybrid architecture |
-| /models/granite-4.0-micro-q4_K_M.gguf | Dense hybrid |
-| /models/qwen3-4b-q4_K_M.gguf | 256K context |
-| /models/gemma-3-4b-it-q4_K_M.gguf | QAT optimized |
-| /models/ministral-3b-instruct-q4_K_M.gguf | Function calling |
-| /models/qwen3-1.7b-q4_K_M.gguf | Mid-size |
-| /models/qwen3-0.6b-q4_K_M.gguf | Speed baseline |
-| /models/granite-4.0-nano-1b-q4_K_M.gguf | Edge optimized |
-| /models/tinyllama-1.1b-chat-v1.0-q4_K_M.gguf | Legacy |
-
-**Extra model not in 1x (keep):**
-- /models/qwen2.5-3b-instruct-q4_K_M.gguf
-
-### 1660super-4x (24GB)
-
-**Missing models from 1660super-2x:**
-| Model | Notes |
-|-------|-------|
-| /models/qwen2.5-3b-instruct-q4_K_M.gguf | Present in 2x |
-| /models/llama-3.2-3b-instruct-q4_K_M.gguf | Present in 2x |
-| /models/phi-4-mini-instruct-q4_K_M.gguf | Present in 2x |
-| /models/gemma-2-2b-it-q4_K_M.gguf | Present in 2x |
-| /models/codellama-7b-instruct-q4_K_M.gguf | Present in 2x |
-| *All models missing from 2x* | Cascading |
-
-### 3060ti (8GB)
-
-**Missing models from 1660super-1x:**
-- All new Tier 1 models (smollm3, granite4, etc.)
-- gemma-2-2b missing but gemma-3-4b should be there
-
-### 3090ti (24GB) / 3090ti-3060ti (32GB)
-
-**Missing many smaller models** - same pattern as Ollama
-
----
-
-## vLLM Configuration Issues
-
-### 1660super-2x (12GB)
-
-**Missing models from 1660super-1x:**
-| Model | Notes |
-|-------|-------|
-| Qwen/Qwen2.5-3B-Instruct-AWQ | AWQ quantized |
-| Qwen/Qwen3-4B-AWQ | AWQ quantized |
-| google/gemma-3-4b-it-gptq-int4 | GPTQ quantized |
-| microsoft/Phi-3-mini-4k-instruct-awq | AWQ quantized |
-| TinyLlama/TinyLlama-1.1B-Chat-v1.0 | FP16 small |
-| HuggingFaceTB/SmolLM2-1.7B-Instruct | FP16 small |
-
-### 1660super-4x (24GB)
-
-**Missing models from 1660super-2x:**
-| Model | Notes |
-|-------|-------|
-| Qwen/Qwen2.5-1.5B-Instruct | FP16 |
-| meta-llama/Llama-3.2-1B-Instruct | FP16 |
-| TheBloke/Mistral-7B-Instruct-v0.2-AWQ | AWQ 7B |
-| TheBloke/Llama-2-7B-Chat-AWQ | AWQ 7B |
-| *All models missing from 2x* | Cascading |
-
-### 3060ti (8GB) / 3090ti (24GB) / 3090ti-3060ti (32GB)
-
-**Similar inheritance issues** - missing quantized models from smaller configs
+| Configuration | Status | Models | Inherits From |
+|---------------|--------|--------|---------------|
+| 1660super-1x | ✅ | 8 | Base config |
+| 1660super-2x | ✅ | 14 | 1660super-1x |
+| 1660super-4x | ✅ | 22 | 1660super-2x |
+| 3060ti | ✅ | 14 | 1660super-1x |
+| 3070 | ✅ | 14 | 1660super-1x (same VRAM as 3060ti) |
+| 3090ti | ✅ | 22 | 3060ti/3070 |
+| 3090ti-3060ti | ✅ | 26 | 3090ti |
 
 ---
 
 ## Summary
 
-| Engine | Configs Audited | Issues Found | Severity |
-|--------|-----------------|--------------|----------|
-| Ollama | 7 | 6 configs with missing models | High |
-| llama.cpp | 7 | 6 configs with missing models | High |
-| vLLM | 7 | 5 configs with missing models | High |
-
-**Total inheritance violations**: 45+ missing models across all configs
-
----
-
-## Fixes Applied
-
-All configuration files have been updated to ensure proper inheritance:
-
-1. **1660super-2x**: Added all models from 1x
-2. **1660super-4x**: Added all models from 2x
-3. **3060ti/3070**: Added new Tier 1 models from research
-4. **3090ti**: Added all models from 8GB cards
-5. **3090ti-3060ti**: Added all models from 3090ti
-
-Each config now follows the format:
-```
-# [GPU Config Name]
-# [Description]
-
-# =============================================================================
-# INHERITED FROM [smaller config]
-# =============================================================================
-[models from smaller config]
-
-# =============================================================================
-# NEW MODELS FOR [this VRAM tier]
-# =============================================================================
-[additional models for this tier]
-```
+| Engine | Total Configs | Passing | Issues |
+|--------|---------------|---------|--------|
+| Ollama | 7 | 7 | 0 |
+| llama.cpp | 7 | 7 | 0 |
+| vLLM | 7 | 7 | 0 |
+| **Total** | **21** | **21** | **0** |
 
 ---
 
-*Report generated: December 2025*
+## Fixes Applied (This Session)
+
+### Created Missing RTX 3070 Config Files
+
+The RTX 3070 (8GB) was missing llama.cpp and vLLM config files. Created:
+
+1. `gpus/nvidia/3070/configs/llamacpp_models.txt`
+   - Inherits all 19 models from 3060ti (same 8GB VRAM)
+   - Includes Tier 1, 2, 3 models from 1660super-1x
+   - Includes 7B Q4 quantized models
+
+2. `gpus/nvidia/3070/configs/vllm_models.txt`
+   - Inherits all 14 models from 3060ti (same 8GB VRAM)
+   - Includes AWQ/GPTQ quantized models
+   - Includes FP16 small models
+
+### Previous Session Fixes
+
+1. **Within-GPU Multiplicity** (1660 Super 1x → 2x → 4x):
+   - Added all missing Tier 1 models (SmolLM3, Granite 4.0, Qwen3, Gemma 3)
+   - Added all missing Tier 2 models (Ministral, Phi-4 Mini)
+   - Added all missing Tier 3 models (Qwen3-0.6B, Granite Nano, TinyLlama)
+
+2. **Cross-GPU VRAM Inheritance**:
+   - 3060ti/3070 now includes all 1660super-1x models plus 7B variants
+   - 3090ti now includes all 8GB card models plus 13-14B+ models
+   - 3090ti-3060ti now includes all 3090ti models plus 70B models
+
+---
+
+## Configuration File Format
+
+All config files now follow this standardized format:
+
+```
+# [Engine] models for [GPU] ([VRAM] VRAM)
+# [Engine-specific notes]
+# Updated: [Date]
+
+# =============================================================================
+# INHERITED FROM [parent config] - ALL MODELS MUST BE INCLUDED
+# =============================================================================
+
+# --- From [smaller config] ---
+[Tier 1 models]
+[Tier 2 models]
+[Tier 3 models]
+
+# --- From [intermediate config] ---
+[intermediate tier models]
+
+# =============================================================================
+# NEW MODELS FOR [VRAM] VRAM
+# =============================================================================
+[models unique to this tier]
+```
+
+---
+
+## Inheritance Rules Reference
+
+### Within-GPU Multiplicity
+- 2x config MUST include ALL models from 1x
+- 4x config MUST include ALL models from 2x
+
+### Cross-GPU VRAM
+- 8GB cards (3060ti, 3070) MUST include all 6GB (1660super-1x) models
+- 24GB cards (3090ti) MUST include all 8GB card models
+- 32GB configs (3090ti+3060ti) MUST include all 24GB models
+
+### Same-VRAM GPUs
+- GPUs with same VRAM (3060ti ≈ 3070) should have identical model lists
+- Performance differences are noted in comments (3070 is ~10-15% faster)
+
+---
+
+*Audit completed: December 2025*
