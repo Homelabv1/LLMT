@@ -492,7 +492,7 @@ def load_models_from_config(filepath: str) -> List[str]:
 def get_model_status(
     results_dir: str,
     model_name: str,
-    total_questions: int = 42
+    total_questions: int = 100
 ) -> Dict:
     """
     Get the status of a model's test run.
@@ -559,7 +559,7 @@ def get_model_status(
 def print_batch_status(
     results_dir: str,
     models: List[str],
-    total_questions: int = 42
+    total_questions: int = 100
 ) -> None:
     """
     Print status table for batch testing.

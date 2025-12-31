@@ -6,10 +6,17 @@ the native /api/generate endpoint for detailed metrics.
 """
 
 import json
+import os
 import time
 from typing import Dict, List, Optional, Union
 
 import requests
+
+# Import from core config if available, otherwise use defaults
+try:
+    from core.config import OLLAMA_DEFAULT_URL
+except ImportError:
+    OLLAMA_DEFAULT_URL = os.environ.get('OLLAMA_URL', 'http://localhost:11434')
 
 
 class OllamaAdapter:
@@ -20,16 +27,16 @@ class OllamaAdapter:
     and detailed metrics extraction.
     """
 
-    DEFAULT_URL = 'http://localhost:11434'
+    DEFAULT_URL = OLLAMA_DEFAULT_URL
 
     def __init__(self, url: Optional[str] = None):
         """
         Initialize OllamaAdapter.
 
         Args:
-            url: Ollama server URL (default: http://localhost:11434)
+            url: Ollama server URL (default: from OLLAMA_URL env or http://localhost:11434)
         """
-        self.base_url = url or self.DEFAULT_URL
+        self.base_url = url or os.environ.get('OLLAMA_URL', self.DEFAULT_URL)
         self._current_model = None  # type: Optional[str]
         self._version = None  # type: Optional[str]
 

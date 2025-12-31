@@ -5,10 +5,17 @@ This module provides an adapter for the vLLM inference engine,
 using the OpenAI-compatible /v1/chat/completions endpoint.
 """
 
+import os
 import time
 from typing import Dict, List, Optional
 
 import requests
+
+# Import from core config if available, otherwise use defaults
+try:
+    from core.config import VLLM_DEFAULT_URL
+except ImportError:
+    VLLM_DEFAULT_URL = os.environ.get('VLLM_URL', 'http://localhost:8000')
 
 
 class VLLMAdapter:
@@ -19,16 +26,16 @@ class VLLMAdapter:
     vLLM loads models at server startup via the --model flag.
     """
 
-    DEFAULT_URL = 'http://localhost:8000'
+    DEFAULT_URL = VLLM_DEFAULT_URL
 
     def __init__(self, url: Optional[str] = None):
         """
         Initialize VLLMAdapter.
 
         Args:
-            url: vLLM server URL (default: http://localhost:8000)
+            url: vLLM server URL (default: from VLLM_URL env or http://localhost:8000)
         """
-        self.base_url = url or self.DEFAULT_URL
+        self.base_url = url or os.environ.get('VLLM_URL', self.DEFAULT_URL)
         self._current_model = None  # type: Optional[str]
         self._version = None  # type: Optional[str]
 

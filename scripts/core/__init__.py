@@ -5,12 +5,24 @@ This package provides the foundational components for testing language models
 on homelab inventory queries.
 
 Modules:
+    config: Centralized configuration and defaults
     questions: Question loading and validation
     results: Results schema and JSONL writer
     metrics: GPU monitoring and cooldown logic
     runner: Test execution engine
+    validation: Input validation utilities
+    logging_config: Logging setup and utilities
 """
 
+from .config import (
+    DEFAULT_QUESTION_COUNT,
+    DEFAULT_TIMEOUTS,
+    DEFAULT_GPU_CONFIG,
+    DEFAULT_TEST_CONFIG,
+    OLLAMA_DEFAULT_URL,
+    LLAMACPP_DEFAULT_URL,
+    VLLM_DEFAULT_URL,
+)
 from .questions import (
     Question,
     load_questions,
@@ -35,8 +47,27 @@ from .runner import (
     TestConfig,
     run_single_test,
 )
+from .validation import (
+    ValidationError,
+    validate_model_name,
+    validate_model_name_strict,
+    validate_file_path,
+    sanitize_for_path,
+)
+from .logging_config import (
+    setup_logging,
+    get_logger,
+)
 
 __all__ = [
+    # config
+    'DEFAULT_QUESTION_COUNT',
+    'DEFAULT_TIMEOUTS',
+    'DEFAULT_GPU_CONFIG',
+    'DEFAULT_TEST_CONFIG',
+    'OLLAMA_DEFAULT_URL',
+    'LLAMACPP_DEFAULT_URL',
+    'VLLM_DEFAULT_URL',
     # questions
     'Question',
     'load_questions',
@@ -57,6 +88,15 @@ __all__ = [
     'TestRunner',
     'TestConfig',
     'run_single_test',
+    # validation
+    'ValidationError',
+    'validate_model_name',
+    'validate_model_name_strict',
+    'validate_file_path',
+    'sanitize_for_path',
+    # logging
+    'setup_logging',
+    'get_logger',
 ]
 
 __version__ = '1.0.0'

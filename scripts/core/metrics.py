@@ -524,9 +524,9 @@ def wait_for_cooldown(
                 print(f"\n  [WARN] Cooldown timeout after {max_wait_sec}s (temp={metrics.temp_c}C)")
             return False
 
-        # Adaptive target if GPU is very hot
+        # Adaptive target if GPU is very hot - relax target to avoid excessive waits
         if metrics.temp_c > 70 and not temp_ok:
-            # Use stricter target for hot GPUs
+            # Allow slightly higher temp target (up to 55C) for very hot GPUs
             target_temp_c = min(target_temp_c + 5, 55)
 
         time.sleep(check_interval_sec)

@@ -98,9 +98,9 @@ Sample output:
 ```
 Model                          Status       Progress   Latency      Tok/s      Updated
 -------------------------------------------------------------------------------------
-qwen3:0.6b                     Complete   42/42      245ms        73.5       2025-12-30 14:30
-qwen3:4b                       Partial    23/42      523ms        48.2       2025-12-30 16:12
-llama3.2:3b                    Pending    0/42       -            -          -
+qwen3:0.6b                     Complete   100/100    245ms        73.5       2025-12-30 14:30
+qwen3:4b                       Partial     53/100    523ms        48.2       2025-12-30 16:12
+llama3.2:3b                    Pending      0/100    -            -          -
 ```
 
 ## Resuming Interrupted Tests
@@ -186,9 +186,9 @@ python scripts/score_results.py \
 
 The scorer displays:
 ```
-Question 15/42 [compatibility]
+Question 44/100 [compatibility]
 Q: What RAM is compatible with the ASUS PRIME B550-PLUS?
-Expected: DDR4 3200MHz (32GB modules available in spare_parts)
+Expected: DDR4 3200MHz 32GB modules (2 available in spare parts)
 
 Model Response:
 The ASUS PRIME B550-PLUS is compatible with DDR4 RAM...

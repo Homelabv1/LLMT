@@ -29,12 +29,20 @@ A production-ready testing framework for evaluating and benchmarking small langu
 
 **LXC Container:**
 - Ubuntu 22.04/24.04 with GPU access
+- Git (for cloning the repository)
 - Docker with NVIDIA Container Toolkit
 - Python 3.9+
 
 ```bash
-# In LXC container - verify GPU passthrough
+# In LXC container - install prerequisites
+apt update && apt install -y git python3 python3-pip
+
+# Verify GPU passthrough
 nvidia-smi
+
+# Clone the repository
+git clone <repository-url> llm-testing
+cd llm-testing
 
 # Install Python dependencies
 pip install -r scripts/requirements.txt
@@ -159,16 +167,16 @@ llm-testing/
 
 ## Test Questions
 
-The framework includes 42 sample test questions for a **homelab inventory assistant** use case, covering 8 categories:
+The framework includes 100 sample test questions for a **homelab inventory assistant** use case, covering 8 categories:
 
-1. **Simple Lookups (8)**: Direct retrieval (IP addresses, RAM, CPUs)
-2. **Aggregation (6)**: Sum/count operations (total VRAM, system counts)
-3. **Filtering (6)**: Conditional logic (systems with 10GbE, GPUs)
-4. **Compatibility (6)**: Hardware relationships (RAM compatibility, upgrades)
-5. **Complex Multi-step (4)**: Chained reasoning (best upgrade candidate)
-6. **Natural Language (5)**: Informal query variations ("got anything beefy?")
-7. **Inventory Management (3)**: Change/update scenarios
-8. **Error Handling (4)**: Missing/invalid data responses
+1. **Simple Lookups (15)**: Direct retrieval (IP addresses, RAM, CPUs)
+2. **Aggregation (14)**: Sum/count operations (total VRAM, system counts)
+3. **Filtering (14)**: Conditional logic (systems with 10GbE, GPUs)
+4. **Compatibility (12)**: Hardware relationships (RAM compatibility, upgrades)
+5. **Complex Multi-step (12)**: Chained reasoning (best upgrade candidate)
+6. **Natural Language (14)**: Informal query variations ("got anything beefy?")
+7. **Inventory Management (10)**: Change/update scenarios
+8. **Error Handling (9)**: Missing/invalid data responses
 
 Custom question sets can be provided via `--questions` and `--inventory` flags for your own use cases.
 

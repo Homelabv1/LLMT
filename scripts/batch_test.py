@@ -218,7 +218,7 @@ def get_models(args) -> List[str]:
         return []
 
 
-def count_status(results_dir: str, models: List[str], total_questions: int = 42):
+def count_status(results_dir: str, models: List[str], total_questions: int = 100):
     """Count models by status."""
     complete = 0
     partial = 0
@@ -271,7 +271,7 @@ def main():
             questions = load_questions(args.questions)
             total_q = len(questions)
         except Exception:
-            total_q = 42
+            total_q = 100  # Default question count
 
         print_batch_status(results_dir, models, total_q)
         return 0

@@ -123,7 +123,7 @@ class RunMetadata:
         gpu_count: int = 1,
         test_config: Optional[Dict] = None,
         power_limits_applied: Optional[str] = None,
-        total_questions: int = 42
+        total_questions: int = 100
     ):
         """
         Initialize RunMetadata instance.

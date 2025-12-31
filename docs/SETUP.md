@@ -173,18 +173,31 @@ docker run -d --gpus all \
     --gpu-memory-utilization 0.95
 ```
 
-## 5. Python Environment
+## 5. Python Environment and Framework Setup
 
 ```bash
-# Install Python 3.9+
-apt install -y python3 python3-pip python3-venv
+# Install prerequisites
+apt install -y git python3 python3-pip python3-venv
+
+# Clone the repository
+git clone <repository-url> /opt/llm-testing
+cd /opt/llm-testing
 
 # Create virtual environment (optional)
-python3 -m venv /opt/llm-testing-env
-source /opt/llm-testing-env/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 
 # Install dependencies
-pip install -r /mnt/llm-testing/scripts/requirements.txt
+pip install -r scripts/requirements.txt
+```
+
+Alternatively, if using shared storage:
+
+```bash
+# Clone to shared storage
+git clone <repository-url> /mnt/llm-testing
+cd /mnt/llm-testing
+pip install -r scripts/requirements.txt
 ```
 
 ## 6. Shared Storage Setup

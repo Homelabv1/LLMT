@@ -9,10 +9,17 @@ requires restarting the container. See llamacpp_batch.sh for the
 container management workflow.
 """
 
+import os
 import time
 from typing import Dict, Optional
 
 import requests
+
+# Import from core config if available, otherwise use defaults
+try:
+    from core.config import LLAMACPP_DEFAULT_URL
+except ImportError:
+    LLAMACPP_DEFAULT_URL = os.environ.get('LLAMACPP_URL', 'http://localhost:8080')
 
 
 class LlamaCppAdapter:
@@ -24,16 +31,16 @@ class LlamaCppAdapter:
     on querying via the /completion endpoint.
     """
 
-    DEFAULT_URL = 'http://localhost:8080'
+    DEFAULT_URL = LLAMACPP_DEFAULT_URL
 
     def __init__(self, url: Optional[str] = None):
         """
         Initialize LlamaCppAdapter.
 
         Args:
-            url: llama.cpp server URL (default: http://localhost:8080)
+            url: llama.cpp server URL (default: from LLAMACPP_URL env or http://localhost:8080)
         """
-        self.base_url = url or self.DEFAULT_URL
+        self.base_url = url or os.environ.get('LLAMACPP_URL', self.DEFAULT_URL)
         self._current_model = None  # type: Optional[str]
 
     def get_name(self) -> str:
