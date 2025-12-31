@@ -1,16 +1,16 @@
 # Test Data
 
-This directory contains the test data for the LLM Testing Framework.
+This directory contains sample test data for the LLM Testing Framework.
 
 ## Files
 
 ### homelab_inventory.json
 
-The homelab inventory dataset containing:
+A sample dataset representing a homelab infrastructure. This serves as example context data that gets injected into the system prompt. You can replace this with your own dataset.
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| Servers | 10 | Production servers (Proxmox, NAS, K8s, etc.) |
+| Servers | 10 | Production servers |
 | Desktops | 5 | Workstations and PCs |
 | Mini PCs | 5 | Low-power systems |
 | LLM Rigs | 5 | GPU-equipped testing systems |
@@ -19,16 +19,16 @@ The homelab inventory dataset containing:
 
 ### homelab_test_questions.json
 
-42 test questions across 8 categories:
+42 sample test questions across 8 categories:
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| simple_lookup | 8 | Direct retrieval (IP, RAM, CPU) |
+| simple_lookup | 8 | Direct information retrieval |
 | aggregation | 6 | Sum/count operations |
 | filtering | 6 | Conditional logic |
-| compatibility | 6 | Hardware relationships |
+| compatibility | 6 | Relationship reasoning |
 | complex_multistep | 4 | Chained reasoning |
-| natural_language | 5 | Informal queries |
+| natural_language | 5 | Informal query variations |
 | inventory_management | 3 | Change scenarios |
 | error_handling | 4 | Missing/invalid data |
 
@@ -40,8 +40,8 @@ The homelab inventory dataset containing:
 {
   "q_id": 1,
   "category": "simple_lookup",
-  "question": "What is the IP address of pve-main?",
-  "expected": "192.168.1.10",
+  "question": "Your question text here",
+  "expected": "Expected answer",
   "difficulty": "easy"
 }
 ```
@@ -52,46 +52,39 @@ The homelab inventory dataset containing:
 - `medium`: Aggregations, filtering, basic reasoning
 - `hard`: Multi-step reasoning, complex comparisons
 
-## Customization
+## Custom Datasets
 
-### Adding Questions
+The sample data demonstrates the framework's capabilities, but you can use your own:
 
-Add to the `questions` array in `homelab_test_questions.json`:
+### Using Custom Questions and Data
 
-```json
-{
-  "q_id": 43,
-  "category": "simple_lookup",
-  "question": "Your question here",
-  "expected": "Expected answer",
-  "difficulty": "easy"
-}
-```
-
-### Adding Inventory Items
-
-Add to the appropriate category in `homelab_inventory.json`:
-
-```json
-{
-  "name": "new-server-01",
-  "type": "server",
-  "ip": "192.168.1.100",
-  "cpu": {"model": "...", "cores": 8, "threads": 16},
-  "ram_gb": 64,
-  ...
-}
-```
-
-### Custom Datasets
-
-Create your own files following the same schema:
-
-```python
+```bash
 python scripts/run_test.py \
     --questions /path/to/my_questions.json \
-    --inventory /path/to/my_inventory.json
+    --inventory /path/to/my_data.json
 ```
+
+### Creating Custom Questions
+
+Create a JSON file with this structure:
+
+```json
+{
+  "questions": [
+    {
+      "q_id": 1,
+      "category": "simple_lookup",
+      "question": "Your question here",
+      "expected": "Expected answer",
+      "difficulty": "easy"
+    }
+  ]
+}
+```
+
+### Creating Custom Context Data
+
+The inventory/context file can be any JSON structure. It gets serialized and injected into the system prompt template in `scripts/core/questions.py`.
 
 ## Validation
 
