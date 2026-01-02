@@ -1,4 +1,0 @@
-# LLM Testing Framework Dependencies
-# Minimal requirements - only HTTP client needed
-
-requests>=2.28.0
