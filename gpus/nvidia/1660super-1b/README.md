@@ -55,4 +55,26 @@ python scripts/batch_test.py --engine ollama --config gpus/nvidia/1660super-1b/m
 
 ## Results Location
 
-Results go to: `gpus/nvidia/1660super-1b/results/<engine>/<model>/`
+Results are automatically stored in:
+
+```
+gpus/nvidia/1660super-1b/results/
+├── ollama/
+│   ├── qwen2.5-1.5b/
+│   │   └── results.jsonl      # Atomic writes, resume-safe
+│   ├── qwen3-1.7b/
+│   └── ...
+├── llamacpp/
+│   └── <model>/
+└── vllm/
+    └── <model>/
+```
+
+**Path pattern:** `gpus/nvidia/1660super-1b/results/<engine>/<model>/results.jsonl`
+
+**Custom location:** Use `--results-dir` to override:
+```bash
+python scripts/batch_test.py --engine ollama --config gpus/nvidia/1660super-1b/models.yaml --results-dir /custom/path/
+```
+
+The results directory is auto-created on first run.
